@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MyJournal - ChatGPT OpenAI Personal AI Companion</title>
+  <meta name="description" content="Your personal AI journal that remembers, understands, and grows with you." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>" />
+  
+  <!-- Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- React 18 & ReactDOM & Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-light: rgba(99, 102, 241, 0.1);
+      --accent: #22C55E;
+      --accent-hover: #16A34A;
+      --bg-main: #F8FAFC;
+      --bg-sidebar: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-card-glass: rgba(255, 255, 255, 0.85);
+      --border-color: #E2E8F0;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --shadow-glass: 0 8px 32px 0 rgba(99, 102, 241, 0.08);
+      --radius-lg: 20px;
+    }
+
+    .dark-theme {
+      --bg-main: #090D16;
+      --bg-sidebar: #0F172A;
+      --bg-card: #1E293B;
+      --bg-card-glass: rgba(30, 41, 59, 0.75);
+      --border-color: #334155;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: var(--bg-card-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-glass);
+      border-radius: var(--radius-lg);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10A37F 0%, #16A34A 100%);
+      color: #ffffff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px 0 rgba(16, 163, 127, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px 0 rgba(16, 163, 127, 0.5);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1.5rem;
+      border-radius: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(16, 163, 127, 0.1);
+      border-color: #10A37F;
+      color: #10A37F;
+    }
+
+    .badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .badge-indigo { background: rgba(99, 102, 241, 0.12); color: #6366F1; border: 1px solid rgba(99, 102, 241, 0.25); }
+    .badge-emerald { background: rgba(16, 163, 127, 0.12); color: #10A37F; border: 1px solid rgba(16, 163, 127, 0.25); }
+    .badge-amber { background: rgba(245, 158, 11, 0.12); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .badge-rose { background: rgba(244, 63, 94, 0.12); color: #F43F5E; border: 1px solid rgba(244, 63, 94, 0.25); }
+    .badge-purple { background: rgba(168, 85, 247, 0.12); color: #A855F7; border: 1px solid rgba(168, 85, 247, 0.25); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fadeIn 0.35s ease forwards; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 9999px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const STORAGE_KEY = 'myjournal_app_data';
+
+    const defaultInitialData = {
+      user: {
+        id: "u-101",
+        name: "Alex Morgan",
+        bio: "AI Researcher & Full-Stack Architect passionate about mindfulness and personal growth.",
+        email: "alex.morgan@example.com",
+        memberSince: "July 2026",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+        focusAreas: ["🤖 AI & Technology", "🏃 Health & Fitness", "🎨 Design & UI", "📚 Learning"]
+      },
+      journals: [
+        {
+          id: "j-1",
+          date: new Date(Date.now() - 86400000 * 2).toISOString(),
+          content: "Today I completed my AI project presentation. I also started learning Machine Learning basics on Coursera. I'm excited because my presentation went really well and my professor loved the demo!",
+          mood: "Happy",
+          moodEmoji: "😊",
+          goals: ["Learn Machine Learning"],
+          achievements: ["Completed AI Project Presentation"],
+          skills: ["Artificial Intelligence", "Public Speaking"],
+          projects: ["MyJournal AI"],
+          events: ["Project Presentation"],
+          ideas: ["Build an AI memory graph visualizer"],
+          people: ["Professor Smith"],
+          tags: ["AI", "Milestone", "Learning"],
+          summary: "Completed AI project presentation successfully and started learning Machine Learning."
+        },
+        {
+          id: "j-2",
+          date: new Date(Date.now() - 86400000 * 1).toISOString(),
+          content: "Spent 4 hours refactoring the frontend using React and Vite. Focused on adding dark mode and smooth CSS glassmorphic cards. Had a coffee chat with Sarah about user experience design.",
+          mood: "Productive",
+          moodEmoji: "⚡",
+          goals: ["Master Glassmorphism UI", "Complete Frontend MVP"],
+          achievements: ["Refactored React Architecture"],
+          skills: ["React", "CSS Architecture"],
+          projects: ["MyJournal SaaS"],
+          events: ["Coffee Chat with Sarah"],
+          ideas: ["Add voice memo input to journal"],
+          people: ["Sarah"],
+          tags: ["Frontend", "React", "Design"],
+          summary: "Refactored React app frontend, added glassmorphic dark mode, and discussed UX with Sarah."
+        },
+        {
+          id: "j-3",
+          date: new Date().toISOString(),
+          content: "Woke up early and ran 5 kilometers in the park. Feel super energetic! Later worked on backend REST APIs for MyJournal using Node.js and Express. Integrated Gemini AI prompt memory retrieval.",
+          mood: "Energetic",
+          moodEmoji: "🔥",
+          goals: ["Run 5km 3x a week"],
+          achievements: ["Ran 5km morning workout", "Built Gemini RAG Engine"],
+          skills: ["Node.js", "Express", "REST APIs", "Fitness"],
+          projects: ["Health", "MyJournal AI"],
+          events: ["Morning 5k Run"],
+          ideas: ["Automate weekly AI summary generation"],
+          people: [],
+          tags: ["Health", "Backend", "Nodejs"],
+          summary: "Completed a 5km morning run and implemented Node.js REST API with Gemini RAG memory chat."
+        }
+      ],
+      goals: [
+        {
+          id: "g-1",
+          title: "Learn Machine Learning",
+          createdDate: new Date(Date.now() - 86400000 * 2).toISOString(),
+          status: "In Progress",
+          progress: 40,
+          priority: "High",
+          category: "Learning"
+        },
+        {
+          id: "g-2",
+          title: "Master Glassmorphism UI",
+          createdDate: new Date(Date.now() - 86400000 * 1).toISOString(),
+          status: "In Progress",
+          progress: 75,
+          priority: "Medium",
+          category: "Design"
+        },
+        {
+          id: "g-3",
+          title: "Run 5km 3x a week",
+          createdDate: new Date().toISOString(),
+          status: "In Progress",
+          progress: 60,
+          priority: "High",
+          category: "Health"
+        },
+        {
+          id: "g-4",
+          title: "Complete AI Project Presentation",
+          createdDate: new Date(Date.now() - 86400000 * 5).toISOString(),
+          status: "Completed",
+          progress: 100,
+          priority: "High",
+          category: "Academic"
+        }
+      ],
+      achievements: [
+        {
+          id: "a-1",
+          title: "Completed AI Project Presentation",
+          date: new Date(Date.now() - 86400000 * 2).toISOString(),
+          category: "Academic",
+          description: "Successfully presented the AI project and received high praise from Professor Smith."
+        },
+        {
+          id: "a-2",
+          title: "Refactored React Architecture",
+          date: new Date(Date.now() - 86400000 * 1).toISOString(),
+          category: "Engineering",
+          description: "Upgraded frontend state architecture and built dark mode glassmorphic component system."
+        },
+        {
+          id: "a-3",
+          title: "Ran 5km morning workout",
+          date: new Date().toISOString(),
+          category: "Health",
+          description: "Achieved new personal morning run consistency goal."
+        },
+        {
+          id: "a-4",
+          title: "Built Gemini RAG Engine",
+          date: new Date().toISOString(),
+          category: "Engineering",
+          description: "Engineered memory retrieval context pipeline for MyJournal AI chat."
+        }
+      ]
+    };
+
+    function loadData() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultInitialData));
+        return defaultInitialData;
+      }
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return defaultInitialData;
+      }
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function extractMemoryFromJournal(text) {
+      const lower = text.toLowerCase();
+      let mood = 'Happy';
+      let emoji = '😊';
+
+      if (lower.includes('excited') || lower.includes('happy') || lower.includes('loved') || lower.includes('awesome') || lower.includes('great')) {
+        mood = 'Happy'; emoji = '😊';
+      } else if (lower.includes('energetic') || lower.includes('run') || lower.includes('workout') || lower.includes('fire')) {
+        mood = 'Energetic'; emoji = '🔥';
+      } else if (lower.includes('productive') || lower.includes('completed') || lower.includes('built') || lower.includes('refactored')) {
+        mood = 'Productive'; emoji = '⚡';
+      } else if (lower.includes('tired') || lower.includes('reflective') || lower.includes('thought')) {
+        mood = 'Reflective'; emoji = '💭';
+      }
+
+      const goals = [];
+      const achievements = [];
+      const skills = [];
+      const projects = [];
+      const events = [];
+      const ideas = [];
+      const people = [];
+      const tags = [];
+
+      if (lower.includes('learning') || lower.includes('start') || lower.includes('learn')) {
+        if (lower.includes('machine learning') || lower.includes('ml')) goals.push("Learn Machine Learning");
+        if (lower.includes('react') || lower.includes('frontend')) goals.push("Master React Frontend");
+      }
+      if (goals.length === 0) goals.push("Maintain personal growth & daily coding consistency");
+
+      if (lower.includes('completed') || lower.includes('finished') || lower.includes('achieved') || lower.includes('presentation')) {
+        const sentences = text.split(/[.!?]/).filter(Boolean);
+        for (const s of sentences) {
+          if (s.toLowerCase().includes('completed') || s.toLowerCase().includes('went really well')) {
+            achievements.push(s.trim());
+            break;
+          }
+        }
+      }
+      if (achievements.length === 0 && lower.includes('presentation')) achievements.push("Presentation Completed");
+
+      if (lower.includes('ai') || lower.includes('machine learning')) skills.push("AI / Machine Learning");
+      if (lower.includes('react') || lower.includes('css')) skills.push("React & CSS Architecture");
+      if (lower.includes('node') || lower.includes('express')) skills.push("Node.js APIs");
+
+      if (lower.includes('myjournal') || lower.includes('journal')) projects.push("MyJournal AI App");
+      if (lower.includes('ai project')) projects.push("AI Semester Project");
+
+      if (lower.includes('presentation')) events.push("Presentation Demo");
+      if (lower.includes('coffee chat')) events.push("Coffee Chat");
+
+      if (lower.includes('idea') || lower.includes('visualizer')) ideas.push("Build AI memory visualizer");
+
+      if (text.includes('Sarah')) people.push("Sarah");
+      if (text.includes('Professor Smith')) people.push("Professor Smith");
+
+      if (skills.length > 0) tags.push(...skills);
+      if (tags.length === 0) tags.push("Journal", "Reflection");
+
+      const summary = text.length > 110 ? text.slice(0, 110) + "..." : text;
+
+      return {
+        mood,
+        moodEmoji: emoji,
+        goals,
+        achievements,
+        skills,
+        projects,
+        events,
+        ideas,
+        people,
+        tags: Array.from(new Set(tags)),
+        summary
+      };
+    }
+
+    function processChatGPTFriendlyResponse(queryStr, journals, goalsList, onUpdateGoals) {
+      const qLower = queryStr.toLowerCase();
+
+      if (qLower.includes('complete') || qLower.includes('finished') || qLower.includes('done')) {
+        const matched = goalsList.find(g => qLower.includes(g.title.toLowerCase()));
+        if (matched) {
+          const updatedList = goalsList.map(g => g.id === matched.id ? { ...g, status: 'Completed', progress: 100 } : g);
+          onUpdateGoals(updatedList);
+          return {
+            text: `Woohoo! 🎉 That is incredible news! I'm so proud of you for completing **"${matched.title}"**! 🏆\n\nI have updated your goal to **100% Completed** in your Goals Tracker. Keep shining bright! 🌟 How are you feeling right now?`,
+            card: { title: matched.title, status: 'Completed', progress: 100 }
+          };
+        }
+      }
+
+      if (qLower.includes('change') || qLower.includes('update') || qLower.includes('rename') || qLower.includes('customize')) {
+        const targetGoal = goalsList.find(g => qLower.includes(g.title.toLowerCase()) || g.title.toLowerCase().split(' ').some(w => w.length > 3 && qLower.includes(w)));
+        if (targetGoal) {
+          const parts = queryStr.split(/ to | as | into | instead of /i);
+          if (parts.length > 1) {
+            const newTitle = parts[1].replace(/["']/g, '').trim();
+            const oldTitle = targetGoal.title;
+            const updatedList = goalsList.map(g => g.id === targetGoal.id ? { ...g, title: newTitle } : g);
+            onUpdateGoals(updatedList);
+            return {
+              text: `Absolutely, my friend! ✨ I've customized your goal just the way you wanted!\n\nChanged **"${oldTitle}"** ➔ **"${newTitle}"** in your Goals Tracker. You've got this, and I'm right here with you every step of the way! 💖`,
+              card: { title: newTitle, status: targetGoal.status, progress: targetGoal.progress }
+            };
+          }
+        }
+      }
+
+      if (qLower.includes('add') || qLower.includes('new goal') || qLower.includes('set a goal')) {
+        let title = queryStr.replace(/add goal|add a goal|set a goal to|new goal:|my new goal is|add/gi, '').replace(/["']/g, '').trim();
+        if (title.length > 2) {
+          const newGoalObj = {
+            id: 'g-' + Date.now(),
+            title: title,
+            createdDate: new Date().toISOString(),
+            status: 'In Progress',
+            progress: 15,
+            priority: 'High',
+            category: 'Personal Growth'
+          };
+          onUpdateGoals([newGoalObj, ...goalsList]);
+          return {
+            text: `That sounds like a wonderful goal! 🎯 I've added **"${title}"** to your Goals Tracker!\n\nI'll be here to encourage you whenever you make progress. What inspired this goal today? 😊`,
+            card: { title: title, status: 'In Progress', progress: 15 }
+          };
+        }
+      }
+
+      if (qLower.includes('goal')) {
+        const allG = goalsList.map(g => `• 🎯 **${g.title}** (${g.status} - ${g.progress}%)`).join('\n');
+        return {
+          text: `Hey there! 😊 Here are your current active goals:\n\n${allG}\n\n💖 *I'd love to help you customize them! Just tell me: "Change my goal Learn Machine Learning to Master Deep Learning", or "Add goal: Meditate 10 mins daily"!*`
+        };
+      }
+
+      if (qLower.includes('achieve') || qLower.includes('achievement') || qLower.includes('unlocked')) {
+        const allAch = defaultInitialData.achievements.map(a => `🏆 **${a.title}** (${new Date(a.date).toLocaleDateString()})`).join('\n');
+        return {
+          text: `Look at how much you've accomplished! 🎉 I am so proud of your hard work:\n\n${allAch}\n\nYou are capable of amazing things, my friend! ✨`
+        };
+      }
+
+      if (qLower.includes('mood')) {
+        const moods = journals.map(j => `• ${new Date(j.date).toLocaleDateString()}: ${j.moodEmoji} ${j.mood}`);
+        return {
+          text: `Here is a look at your emotional journey recently! 🌈\n\n${moods.join('\n')}\n\nYou've had such energetic and positive momentum! Remember, I'm always here to listen whenever you want to express your thoughts. Hugs! 🤗`
+        };
+      }
+
+      if (qLower.includes('summarize') || qLower.includes('summary') || qLower.includes('week')) {
+        return {
+          text: `Here is a warm, loving summary of your journey this week! 🌟\n\n` +
+            `• **Memories Logged**: ${journals.length} journal reflections\n` +
+            `• **Highlights**: Successful AI project presentation, frontend React dark mode build, and 5km morning workouts!\n` +
+            `• **Growth**: Learning Machine Learning & building MyJournal.\n\nYou are doing fantastic!`
+        };
+      }
+
+      return {
+        text: `Hey! I'm right here with you! 😊 I love chatting with you. You can ask me about your past journal entries, achievements, or ask me to edit any of your goals on the fly. How are you feeling today? 💖`
+      };
+    }
+
+    // MAIN APP COMPONENT
+    function App() {
+      const [data, setData] = useState(loadData);
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [theme, setTheme] = useState('dark');
+      const [authMode, setAuthMode] = useState(false);
+
+      useEffect(() => {
+        if (theme === 'dark') {
+          document.body.classList.add('dark-theme');
+        } else {
+          document.body.classList.remove('dark-theme');
+        }
+      }, [theme]);
+
+      useEffect(() => {
+        if (window.lucide) {
+          window.lucide.createIcons();
+        }
+      });
+
+      const updateData = (newData) => {
+        setData(newData);
+        saveData(newData);
+      };
+
+      const navItems = [
+        { id: 'dashboard', name: 'Dashboard', icon: 'layout-dashboard' },
+        { id: 'write', name: 'Write Journal', icon: 'pen-square' },
+        { id: 'timeline', name: 'Timeline', icon: 'history' },
+        { id: 'goals', name: 'Goals', icon: 'target' },
+        { id: 'achievements', name: 'Achievements', icon: 'trophy' },
+        { id: 'chat', name: 'ChatGPT AI', icon: 'message-square' },
+        { id: 'summary', name: 'Weekly Summary', icon: 'bar-chart-3' },
+        { id: 'profile', name: 'Profile', icon: 'user' },
+        { id: 'settings', name: 'Settings', icon: 'settings' },
+      ];
+
+      if (authMode) {
+        return <AuthView onLogin={() => setAuthMode(false)} />;
+      }
+
+      return (
+        <div style={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+          
+          {/* SIDEBAR NAVIGATION */}
+          <aside style={{
+            width: '260px',
+            background: 'var(--bg-sidebar)',
+            borderRight: '1px solid var(--border-color)',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100vh',
+            position: 'sticky',
+            top: 0,
+            zIndex: 40
+          }}>
+            <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderBottom: '1px solid var(--border-color)' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #10A37F, #22C55E)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 14px rgba(16, 163, 127, 0.4)' }}>
+                <i data-lucide="bot"></i>
+              </div>
+              <div>
+                <h1 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                  MyJournal <span style={{ fontSize: '0.65rem', background: 'rgba(16, 163, 127, 0.15)', color: '#10A37F', padding: '0.1rem 0.4rem', borderRadius: '6px' }}>GPT 4o</span>
+                </h1>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>OpenAI Personal Companion</p>
+              </div>
+            </div>
+
+            <nav style={{ flex: 1, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto' }}>
+              {navItems.map(item => {
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.85rem',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '14px',
+                      color: isActive ? '#10A37F' : 'var(--text-muted)',
+                      background: isActive ? 'rgba(16, 163, 127, 0.12)' : 'transparent',
+                      border: 'none',
+                      fontWeight: isActive ? 700 : 500,
+                      fontSize: '0.92rem',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <i data-lucide={item.icon} style={{ width: '19px', height: '19px' }}></i>
+                    <span>{item.name}</span>
+                  </button>
+                );
+              })}
+            </nav>
+
+            <div style={{ padding: '1rem' }}>
+              <div className="glass-card" style={{ padding: '1rem', textAlign: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(16, 163, 127, 0.08) 0%, rgba(99, 102, 241, 0.08) 100%)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
+                  ChatGPT Persona Active 💚
+                </div>
+                <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Customized for {data.user.name}</p>
+              </div>
+            </div>
+          </aside>
+
+          {/* MAIN CONTENT AREA */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            
+            {/* TOPBAR */}
+            <header style={{
+              height: '70px',
+              background: 'var(--bg-card-glass)',
+              backdropFilter: 'blur(16px)',
+              borderBottom: '1px solid var(--border-color)',
+              padding: '0 2rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              position: 'sticky',
+              top: 0,
+              zIndex: 30
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '9999px', padding: '0.5rem 1rem', width: '300px' }}>
+                <i data-lucide="search" style={{ width: '16px', height: '16px', color: 'var(--text-muted)' }}></i>
+                <input
+                  type="text"
+                  placeholder="Search entries or memories..."
+                  style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.88rem', width: '100%' }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setActiveTab('timeline'); }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <button
+                  onClick={() => setActiveTab('write')}
+                  className="btn-primary"
+                  style={{ padding: '0.55rem 1.25rem', fontSize: '0.88rem' }}
+                >
+                  <i data-lucide="plus" style={{ width: '18px', height: '18px' }}></i>
+                  <span>Quick Journal</span>
+                </button>
+
+                <button
+                  onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: 'var(--text-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                >
+                  <i data-lucide={theme === 'dark' ? 'sun' : 'moon'} style={{ width: '18px', height: '18px', color: theme === 'dark' ? '#F59E0B' : '#10A37F' }}></i>
+                </button>
+
+                <div
+                  onClick={() => setActiveTab('profile')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.35rem 0.65rem', borderRadius: '9999px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', cursor: 'pointer' }}
+                >
+                  <img src={data.user.avatar} alt="Avatar" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                  <span style={{ fontSize: '0.88rem', fontWeight: 600 }}>{data.user.name}</span>
+                </div>
+              </div>
+            </header>
+
+            {/* TAB CONTENT VIEWS */}
+            <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+              {activeTab === 'dashboard' && <DashboardView data={data} onNavigate={setActiveTab} />}
+              {activeTab === 'write' && <WriteJournalView data={data} onSave={updateData} />}
+              {activeTab === 'timeline' && <TimelineView journals={data.journals} />}
+              {activeTab === 'goals' && <GoalsView goals={data.goals} onUpdate={updateData} fullData={data} />}
+              {activeTab === 'achievements' && <AchievementsView achievements={data.achievements} onNavigate={setActiveTab} />}
+              {activeTab === 'chat' && <ChatGPTView user={data.user} journals={data.journals} goals={data.goals} onUpdateGoals={(newGoals) => updateData({ ...data, goals: newGoals })} />}
+              {activeTab === 'summary' && <WeeklySummaryView journals={data.journals} goals={data.goals} achievements={data.achievements} />}
+              {activeTab === 'profile' && <ProfileView user={data.user} journals={data.journals} goals={data.goals} achievements={data.achievements} onUpdateUser={(newUser) => updateData({ ...data, user: newUser })} />}
+              {activeTab === 'settings' && <SettingsView theme={theme} onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} data={data} onReset={() => updateData(defaultInitialData)} onLogout={() => setAuthMode(true)} />}
+            </main>
+
+          </div>
+        </div>
+      );
+    }
+
+    // 1. DASHBOARD VIEW
+    function DashboardView({ data, onNavigate }) {
+      const todayStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+      const latestJournal = data.journals[0];
+      const currentMood = latestJournal ? `${latestJournal.moodEmoji} ${latestJournal.mood}` : "😊 Happy";
+
+      return (
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '1300px', margin: '0 auto' }}>
+          
+          <div className="glass-card" style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(16, 163, 127, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1.5rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <i data-lucide="calendar" style={{ width: '16px', color: '#10A37F' }}></i>
+                <span>{todayStr}</span>
+              </div>
+              <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem' }}>Welcome back, {data.user.name.split(' ')[0]}! ✨</h2>
+              <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '600px' }}>"{data.user.bio || "Your personal ChatGPT OpenAI journal companion that remembers, understands, and grows with you."}"</p>
+            </div>
+            <button onClick={() => onNavigate('write')} className="btn-primary" style={{ padding: '0.85rem 1.75rem', fontSize: '1rem', borderRadius: '16px' }}>
+              <i data-lucide="sparkles" style={{ width: '20px' }}></i>
+              <span>Write Today's Entry</span>
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(16, 163, 127, 0.12)', color: '#10A37F', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i data-lucide="book-open" style={{ width: '26px' }}></i>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Journals</div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800 }}>{data.journals.length}</div>
+              </div>
+            </div>
+
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(34, 197, 94, 0.12)', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i data-lucide="target" style={{ width: '26px' }}></i>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Goals</div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800 }}>{data.goals.length}</div>
+              </div>
+            </div>
+
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(245, 158, 11, 0.12)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i data-lucide="trophy" style={{ width: '26px' }}></i>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Achievements</div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 800 }}>{data.achievements.length}</div>
+              </div>
+            </div>
+
+            <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+              <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(168, 85, 247, 0.12)', color: '#A855F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i data-lucide="smile" style={{ width: '26px' }}></i>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Current Mood</div>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800 }}>{currentMood}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+            <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'linear-gradient(135deg, #10A37F, #22C55E)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                    <i data-lucide="bot" style={{ width: '18px' }}></i>
+                  </div>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>ChatGPT Memory Reflection</h3>
+                </div>
+                <span className="badge badge-emerald">OpenAI 4o</span>
+              </div>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                {latestJournal ? `"${latestJournal.summary}"` : "No reflection written for today yet."}
+              </p>
+              <button onClick={() => onNavigate('chat')} className="btn-secondary" style={{ marginTop: 'auto', justifyContent: 'center' }}>
+                <span>Chat with ChatGPT about this</span>
+                <i data-lucide="arrow-right" style={{ width: '16px' }}></i>
+              </button>
+            </div>
+
+            <div className="card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Weekly Growth Score</h3>
+                <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#10A37F' }}>92%</span>
+              </div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem', fontWeight: 600 }}>
+                  <span>Consistency</span>
+                  <span>5 / 7 Days</span>
+                </div>
+                <div style={{ height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{ width: '71%', height: '100%', background: '#10A37F' }}></div>
+                </div>
+              </div>
+              <div style={{ padding: '0.85rem', background: 'rgba(16, 163, 127, 0.1)', borderRadius: '14px', fontSize: '0.85rem', color: '#10A37F', fontWeight: 500 }}>
+                💡 You are on track to complete 2 major goals this week!
+              </div>
+            </div>
+          </div>
+
+          <div className="card" style={{ padding: '1.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Recent Journal Memories</h3>
+              <button onClick={() => onNavigate('timeline')} style={{ background: 'none', border: 'none', color: '#10A37F', fontWeight: 600, cursor: 'pointer' }}>
+                View Timeline →
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {data.journals.slice(0, 3).map(item => (
+                <div key={item.id} onClick={() => onNavigate('timeline')} style={{ padding: '1.2rem', borderRadius: '14px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <span style={{ fontSize: '1.75rem' }}>{item.moodEmoji}</span>
+                    <div>
+                      <div style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.25rem' }}>{item.summary}</div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>📅 {new Date(item.date).toLocaleDateString()} • Mood: {item.mood}</div>
+                    </div>
+                  </div>
+                  <span className="badge badge-emerald">#{item.tags[0] || 'Journal'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    // 2. WRITE JOURNAL VIEW
+    function WriteJournalView({ data, onSave }) {
+      const [content, setContent] = useState('');
+      const [isAnalyzing, setIsAnalyzing] = useState(false);
+      const [aiResult, setAiResult] = useState(null);
+
+      const handleSave = () => {
+        if (!content.trim()) return;
+        setIsAnalyzing(true);
+
+        setTimeout(() => {
+          const analysis = extractMemoryFromJournal(content.trim());
+          setAiResult(analysis);
+          setIsAnalyzing(false);
+
+          const newJournal = {
+            id: 'j-' + Date.now(),
+            date: new Date().toISOString(),
+            content: content.trim(),
+            ...analysis
+          };
+
+          const updatedJournals = [newJournal, ...data.journals];
+          
+          let updatedGoals = [...data.goals];
+          if (analysis.goals && analysis.goals.length > 0) {
+            analysis.goals.forEach((g, idx) => {
+              updatedGoals.unshift({
+                id: 'g-' + Date.now() + '-' + idx,
+                title: g,
+                createdDate: new Date().toISOString(),
+                status: 'In Progress',
+                progress: 25,
+                priority: 'High',
+                category: 'Personal Growth'
+              });
+            });
+          }
+
+          let updatedAch = [...data.achievements];
+          if (analysis.achievements && analysis.achievements.length > 0) {
+            analysis.achievements.forEach((a, idx) => {
+              updatedAch.unshift({
+                id: 'a-' + Date.now() + '-' + idx,
+                title: a,
+                date: new Date().toISOString(),
+                category: 'Milestone',
+                description: `Extracted from journal on ${new Date().toLocaleDateString()}`
+              });
+            });
+          }
+
+          onSave({
+            ...data,
+            journals: updatedJournals,
+            goals: updatedGoals,
+            achievements: updatedAch
+          });
+        }, 600);
+      };
+
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10A37F', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.35rem' }}>
+              <i data-lucide="sparkles"></i> CHATGPT OPENAI MEMORY ENGINE ACTIVE
+            </div>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>Write Journal Entry</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Express your daily thoughts. OpenAI AI will extract your mood, goals, achievements, and skills.</p>
+          </div>
+
+          <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="How was your day today? Write anything that's on your mind..."
+              rows={12}
+              style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '1.1rem', lineHeight: 1.7, resize: 'vertical' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '1.25rem', borderTop: '1px solid var(--border-color)' }}>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>Words: {content.trim() ? content.trim().split(/\s+/).length : 0}</div>
+              <div style={{ display: 'flex', gap: '0.85rem' }}>
+                <button onClick={() => { setContent(''); setAiResult(null); }} className="btn-secondary">Clear</button>
+                <button onClick={handleSave} disabled={isAnalyzing || !content.trim()} className="btn-primary">
+                  <i data-lucide="save"></i>
+                  <span>{isAnalyzing ? 'Extracting Memory...' : 'Save Journal'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {aiResult && (
+            <div className="glass-card animate-fade-in" style={{ padding: '2rem', border: '1.5px solid rgba(16, 163, 127, 0.4)', background: 'linear-gradient(135deg, rgba(16, 163, 127, 0.08) 0%, rgba(34, 197, 94, 0.05) 100%)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>✨ ChatGPT Extracted Memory Card</h3>
+                <span className="badge badge-emerald" style={{ padding: '0.5rem 1rem' }}>{aiResult.moodEmoji} Mood: {aiResult.mood}</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                <div className="card"><strong style={{ color: '#10A37F' }}>😊 Mood:</strong> <div style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '0.3rem' }}>{aiResult.moodEmoji} {aiResult.mood}</div></div>
+                <div className="card"><strong style={{ color: '#22C55E' }}>🎯 Goals Detected:</strong> <div style={{ marginTop: '0.3rem' }}>{aiResult.goals.map((g, i) => <span key={i} className="badge badge-emerald" style={{ marginRight: '0.3rem' }}>{g}</span>)}</div></div>
+                <div className="card"><strong style={{ color: '#F59E0B' }}>🏆 Achievements:</strong> <div style={{ marginTop: '0.3rem' }}>{aiResult.achievements.map((a, i) => <span key={i} className="badge badge-amber" style={{ marginRight: '0.3rem' }}>{a}</span>)}</div></div>
+                <div className="card"><strong style={{ color: '#A855F7' }}>💡 Ideas:</strong> <div style={{ marginTop: '0.3rem' }}>{aiResult.ideas.map((id, i) => <span key={i} className="badge badge-purple" style={{ marginRight: '0.3rem' }}>{id}</span>)}</div></div>
+                <div className="card"><strong style={{ color: '#0EA5E9' }}>📚 Skills Mentioned:</strong> <div style={{ marginTop: '0.3rem' }}>{aiResult.skills.map((s, i) => <span key={i} className="badge badge-sky" style={{ marginRight: '0.3rem' }}>{s}</span>)}</div></div>
+                <div className="card"><strong style={{ color: '#F43F5E' }}>👤 People Mentioned:</strong> <div style={{ marginTop: '0.3rem' }}>{aiResult.people.length ? aiResult.people.map((p, i) => <span key={i} className="badge badge-rose" style={{ marginRight: '0.3rem' }}>{p}</span>) : 'None'}</div></div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 3. TIMELINE VIEW
+    function TimelineView({ journals }) {
+      const [search, setSearch] = useState('');
+      const [selectedEntry, setSelectedEntry] = useState(null);
+
+      const filtered = journals.filter(j => j.content.toLowerCase().includes(search.toLowerCase()) || (j.summary && j.summary.toLowerCase().includes(search.toLowerCase())));
+
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>Journal Timeline</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Chronological stream of your experiences and ChatGPT reflections.</p>
+          </div>
+
+          <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <i data-lucide="search" style={{ color: 'var(--text-muted)' }}></i>
+            <input
+              type="text"
+              placeholder="Search timeline entries..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.95rem', width: '100%' }}
+            />
+          </div>
+
+          <div style={{ paddingLeft: '1.5rem', borderLeft: '2px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+            {filtered.map(item => (
+              <div key={item.id} className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{item.moodEmoji}</span>
+                    <span style={{ fontWeight: 700 }}>Mood: {item.mood}</span>
+                    <span className="badge badge-emerald">{new Date(item.date).toLocaleDateString()}</span>
+                  </div>
+                  <button onClick={() => setSelectedEntry(item)} className="btn-secondary" style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem' }}>
+                    View Full Entry
+                  </button>
+                </div>
+                <p style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--text-main)' }}>"{item.summary}"</p>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {item.tags?.map((t, idx) => <span key={idx} className="badge badge-emerald">#{t}</span>)}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {selectedEntry && (
+            <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+              <div className="card animate-fade-in" style={{ width: '100%', maxWidth: '700px', padding: '2rem', borderRadius: '24px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+                  <h3>{selectedEntry.moodEmoji} Journal Entry Detail</h3>
+                  <button onClick={() => setSelectedEntry(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>
+                </div>
+                <p style={{ whiteSpace: 'pre-wrap', lineHeight: 1.8, fontSize: '1.05rem', background: 'var(--bg-main)', padding: '1.25rem', borderRadius: '16px' }}>{selectedEntry.content}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 4. GOALS VIEW
+    function GoalsView({ goals, onUpdate, fullData }) {
+      const toggleGoal = (id) => {
+        const updated = goals.map(g => {
+          if (g.id === id) {
+            const isComp = g.status === 'Completed';
+            return { ...g, status: isComp ? 'In Progress' : 'Completed', progress: isComp ? 50 : 100 };
+          }
+          return g;
+        });
+        onUpdate({ ...fullData, goals: updated });
+      };
+
+      const deleteGoal = (id) => {
+        const updated = goals.filter(g => g.id !== id);
+        onUpdate({ ...fullData, goals: updated });
+      };
+
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>Goals Tracker</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Goals automatically extracted or customized interactively via ChatGPT AI Chat.</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            {goals.map(goal => {
+              const isComp = goal.status === 'Completed';
+              return (
+                <div key={goal.id} className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', borderLeft: isComp ? '4px solid #22C55E' : '4px solid #10A37F' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <span className={`badge ${isComp ? 'badge-emerald' : 'badge-rose'}`}>{isComp ? 'Completed' : `${goal.priority || 'High'} Priority`}</span>
+                      <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginTop: '0.4rem', textDecoration: isComp ? 'line-through' : 'none' }}>{goal.title}</h3>
+                    </div>
+                    <button onClick={() => toggleGoal(goal.id)} style={{ background: 'none', border: 'none', color: isComp ? '#22C55E' : 'var(--text-muted)', cursor: 'pointer' }}>
+                      <i data-lucide="check-circle-2" style={{ width: '26px' }}></i>
+                    </button>
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', marginBottom: '0.35rem' }}><span>Progress</span><span>{goal.progress}%</span></div>
+                    <div style={{ height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${goal.progress}%`, height: '100%', background: isComp ? '#22C55E' : '#10A37F' }}></div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.75rem', borderTop: '1px solid var(--border-color)' }}>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Created {new Date(goal.createdDate).toLocaleDateString()}</span>
+                    <button onClick={() => deleteGoal(goal.id)} style={{ background: 'none', border: 'none', color: '#F43F5E', cursor: 'pointer' }}>Delete</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // 5. ACHIEVEMENTS VIEW
+    function AchievementsView({ achievements, onNavigate }) {
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>Achievements Cabinet</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Milestones and breakthrough accomplishments recognized by ChatGPT AI.</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            {achievements.map(item => (
+              <div key={item.id} className="glass-card" style={{ padding: '1.75rem', borderTop: '4px solid #F59E0B', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span className="badge badge-amber">🏆 {item.category}</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{new Date(item.date).toLocaleDateString()}</span>
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800 }}>{item.title}</h3>
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{item.description}</p>
+                <button onClick={() => onNavigate('timeline')} style={{ marginTop: 'auto', background: 'none', border: 'none', color: '#10A37F', fontWeight: 600, cursor: 'pointer', textAlign: 'left' }}>
+                  View Related Journal →
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // 6. CHATGPT VIEW
+    function ChatGPTView({ user, journals, goals, onUpdateGoals }) {
+      const [query, setQuery] = useState('');
+      const [messages, setMessages] = useState([
+        {
+          sender: 'ai',
+          text: `Hey ${user.name.split(' ')[0]}! 😊 I'm ChatGPT, your super friendly, caring AI companion and journal life coach! 💖\n\nI remember all your past journal memories, goals, and milestones.\n\n✨ *How can I support you today? You can ask me anything about your reflections, or ask me to change/add any of your goals right here!*`
+        }
+      ]);
+      const [isTyping, setIsTyping] = useState(false);
+
+      const chatPrompts = [
+        "Change my goal 'Learn Machine Learning' to 'Master Deep Learning & PyTorch'",
+        "Mark 'Run 5km 3x a week' as completed",
+        "Add goal: Read 20 pages of AI books daily",
+        "What are my active goals?",
+        "Summarize this week lovingly.",
+        "How has my mood evolved?"
+      ];
+
+      const handleSend = (textToSend) => {
+        const q = textToSend || query;
+        if (!q.trim() || isTyping) return;
+
+        const userMsg = { sender: 'user', text: q.trim(), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+        setMessages(prev => [...prev, userMsg]);
+        setQuery('');
+        setIsTyping(true);
+
+        setTimeout(() => {
+          const res = processChatGPTFriendlyResponse(q.trim(), journals, goals, onUpdateGoals);
+          setMessages(prev => [...prev, {
+            sender: 'ai',
+            text: res.text,
+            card: res.card,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }]);
+          setIsTyping(false);
+        }, 500);
+      };
+
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', height: 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, #10A37F, #22C55E)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 6px 18px rgba(16, 163, 127, 0.4)' }}>
+                <i data-lucide="bot" style={{ width: '24px' }}></i>
+              </div>
+              <div>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  ChatGPT OpenAI AI <span className="badge badge-emerald" style={{ fontSize: '0.75rem' }}>GPT 4o Best Friend</span>
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Super friendly, empathetic companion & instant goal customizer</p>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+            {chatPrompts.map((prompt, i) => (
+              <button key={i} onClick={() => handleSend(prompt)} style={{ padding: '0.4rem 0.85rem', borderRadius: '9999px', border: '1px solid var(--border-color)', background: 'var(--bg-card)', color: '#10A37F', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s ease' }}>
+                💬 {prompt}
+              </button>
+            ))}
+          </div>
+
+          <div className="glass-card" style={{ flex: 1, padding: '1.5rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {messages.map((m, i) => {
+              const isUser = m.sender === 'user';
+              return (
+                <div key={i} style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start', gap: '0.75rem' }}>
+                  {!isUser && (
+                    <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #10A37F, #16A34A)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <i data-lucide="bot" style={{ width: '20px' }}></i>
+                    </div>
+                  )}
+
+                  <div style={{ maxWidth: '78%' }}>
+                    <div style={{
+                      padding: '1rem 1.25rem',
+                      borderRadius: isUser ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                      background: isUser ? 'linear-gradient(135deg, #10A37F 0%, #16A34A 100%)' : 'var(--bg-card)',
+                      color: isUser ? '#ffffff' : 'var(--text-main)',
+                      border: isUser ? 'none' : '1px solid var(--border-color)',
+                      boxShadow: isUser ? '0 4px 14px rgba(16, 163, 127, 0.35)' : 'var(--shadow-sm)',
+                      lineHeight: 1.6,
+                      fontSize: '0.98rem',
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {m.text}
+                    </div>
+
+                    {m.card && (
+                      <div style={{ marginTop: '0.5rem', padding: '0.85rem 1rem', background: 'rgba(16, 163, 127, 0.12)', border: '1px solid #10A37F', borderRadius: '14px', color: '#10A37F', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <i data-lucide="check-circle-2" style={{ width: '18px' }}></i>
+                        <span>Updated Goal: "{m.card.title}"</span>
+                        <span className="badge badge-emerald" style={{ marginLeft: 'auto' }}>{m.card.status} ({m.card.progress}%)</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {isUser && (
+                    <img src={user.avatar} alt="User" style={{ width: '38px', height: '38px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0 }} />
+                  )}
+                </div>
+              );
+            })}
+
+            {isTyping && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #10A37F, #16A34A)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <i data-lucide="bot" style={{ width: '20px' }}></i>
+                </div>
+                <span>ChatGPT is crafting a warm response for you... 💖</span>
+              </div>
+            )}
+          </div>
+
+          <div className="card" style={{ padding: '0.75rem 1rem', display: 'flex', gap: '0.75rem', borderRadius: '20px' }}>
+            <input
+              type="text"
+              placeholder="Ask ChatGPT anything or say: 'Change my goal X to Y'..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+              style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '1rem' }}
+            />
+            <button onClick={() => handleSend()} className="btn-primary">
+              <i data-lucide="send" style={{ width: '18px' }}></i>
+              <span>Send</span>
+            </button>
+          </div>
+
+        </div>
+      );
+    }
+
+    // 7. WEEKLY SUMMARY VIEW
+    function WeeklySummaryView({ journals, goals, achievements }) {
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <div>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>Weekly Analytical Report</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Cognitive insights synthesised from your daily experiences.</p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+            <div className="glass-card" style={{ padding: '1.5rem' }}><div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Growth Score</div><div style={{ fontSize: '2rem', fontWeight: 800, color: '#10A37F' }}>92%</div></div>
+            <div className="glass-card" style={{ padding: '1.5rem' }}><div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Productivity Score</div><div style={{ fontSize: '2rem', fontWeight: 800, color: '#6366F1' }}>88%</div></div>
+            <div className="glass-card" style={{ padding: '1.5rem' }}><div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Overall Mood</div><div style={{ fontSize: '1.4rem', fontWeight: 800 }}>⚡ Energetic</div></div>
+            <div className="glass-card" style={{ padding: '1.5rem' }}><div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Goals Completed</div><div style={{ fontSize: '1.75rem', fontWeight: 800 }}>{goals.filter(g => g.status==='Completed').length} / {goals.length}</div></div>
+          </div>
+
+          <div className="card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <h3 style={{ color: '#10A37F' }}>💡 ChatGPT AI Suggestions</h3>
+            <p>• Keep practicing Machine Learning algorithms for 30 minutes each day.</p>
+            <p>• Celebrate your successful AI project presentation and schedule rest cycles.</p>
+          </div>
+        </div>
+      );
+    }
+
+    // 8. INTERACTIVE PROFILE VIEW (FULL USER CUSTOMIZATION ENHANCEMENT)
+    function ProfileView({ user, journals, goals, achievements, onUpdateUser }) {
+      const [isEditing, setIsEditing] = useState(false);
+      const [name, setName] = useState(user.name);
+      const [bio, setBio] = useState(user.bio || "AI Researcher & Full-Stack Architect passionate about mindfulness and personal growth.");
+      const [email, setEmail] = useState(user.email);
+      const [avatar, setAvatar] = useState(user.avatar);
+      const [newFocusTag, setNewFocusTag] = useState('');
+      const [focusAreas, setFocusAreas] = useState(user.focusAreas || ["🤖 AI & Technology", "🏃 Health & Fitness", "🎨 Design & UI", "📚 Learning"]);
+
+      const avatarPresets = [
+        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80",
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80",
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=300&q=80",
+        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=300&q=80"
+      ];
+
+      const handleSave = () => {
+        onUpdateUser({
+          ...user,
+          name: name.trim() || user.name,
+          bio: bio.trim(),
+          email: email.trim(),
+          avatar: avatar.trim(),
+          focusAreas
+        });
+        setIsEditing(false);
+      };
+
+      const addFocusTag = () => {
+        if (newFocusTag.trim() && !focusAreas.includes(newFocusTag.trim())) {
+          setFocusAreas([...focusAreas, newFocusTag.trim()]);
+          setNewFocusTag('');
+        }
+      };
+
+      const removeFocusTag = (tag) => {
+        setFocusAreas(focusAreas.filter(t => t !== tag));
+      };
+
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2 style={{ fontSize: '2.2rem', fontWeight: 800 }}>User Profile & Customization</h2>
+              <p style={{ color: 'var(--text-muted)' }}>Personalize your bio, avatar, interest tags, and account settings.</p>
+            </div>
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className={isEditing ? "btn-secondary" : "btn-primary"}
+            >
+              <i data-lucide={isEditing ? "x" : "edit-3"} style={{ width: '18px' }}></i>
+              <span>{isEditing ? 'Cancel Editing' : 'Customize Profile'}</span>
+            </button>
+          </div>
+
+          {/* EDIT PROFILE MODAL / CONTAINER */}
+          {isEditing ? (
+            <div className="glass-card animate-fade-in" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', border: '1.5px solid #10A37F' }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#10A37F' }}>✏️ Customize Your Profile</h3>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem', display: 'block' }}>Full Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '0.95rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem', display: 'block' }}>Email Address</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '0.95rem' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem', display: 'block' }}>Personal Tagline / Bio</label>
+                <textarea
+                  value={bio}
+                  onChange={(e) => setBio(e.target.value)}
+                  rows={3}
+                  style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '0.95rem', resize: 'vertical' }}
+                />
+              </div>
+
+              {/* Avatar Selector */}
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.5rem', display: 'block' }}>Choose Avatar or Paste Image URL</label>
+                <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  {avatarPresets.map((url, idx) => (
+                    <img
+                      key={idx}
+                      src={url}
+                      alt="Avatar option"
+                      onClick={() => setAvatar(url)}
+                      style={{
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        border: avatar === url ? '3px solid #10A37F' : '2px solid transparent',
+                        boxShadow: avatar === url ? '0 0 12px rgba(16,163,127,0.5)' : 'none'
+                      }}
+                    />
+                  ))}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Or paste custom image URL..."
+                  value={avatar}
+                  onChange={(e) => setAvatar(e.target.value)}
+                  style={{ width: '100%', padding: '0.65rem', borderRadius: '12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              {/* Focus Areas Tags */}
+              <div>
+                <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem', display: 'block' }}>Focus Areas / Interests</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem', marginBottom: '0.75rem' }}>
+                  {focusAreas.map((tag, idx) => (
+                    <span key={idx} className="badge badge-emerald" style={{ cursor: 'pointer' }} onClick={() => removeFocusTag(tag)}>
+                      {tag} ✕
+                    </span>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    placeholder="Add new focus area (e.g. 🧘 Mindfulness)..."
+                    value={newFocusTag}
+                    onChange={(e) => setNewFocusTag(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') addFocusTag(); }}
+                    style={{ flex: 1, padding: '0.6rem 0.85rem', borderRadius: '12px', background: 'var(--bg-main)', border: '1px solid var(--border-color)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                  />
+                  <button type="button" onClick={addFocusTag} className="btn-secondary" style={{ padding: '0.6rem 1rem' }}>+ Add Tag</button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+                <button onClick={() => setIsEditing(false)} className="btn-secondary">Cancel</button>
+                <button onClick={handleSave} className="btn-primary">
+                  <i data-lucide="check" style={{ width: '18px' }}></i>
+                  <span>Save Profile Changes</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* DISPLAY PROFILE CARD */
+            <div className="glass-card" style={{ padding: '2.5rem', display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+              <img
+                src={user.avatar}
+                alt="Avatar"
+                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #10A37F', boxShadow: '0 8px 24px rgba(16, 163, 127, 0.4)' }}
+              />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem' }}>
+                  <h3 style={{ fontSize: '1.8rem', fontWeight: 800 }}>{user.name}</h3>
+                  <span className="badge badge-emerald">Pro ChatGPT Member</span>
+                </div>
+
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.98rem', lineHeight: 1.5, marginBottom: '0.85rem' }}>
+                  "{user.bio || 'AI Researcher & Full-Stack Architect passionate about mindfulness and personal growth.'}"
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', color: 'var(--text-muted)', fontSize: '0.88rem', marginBottom: '1rem' }}>
+                  <span>📧 {user.email}</span>
+                  <span>📅 Member Since {user.memberSince}</span>
+                </div>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                  {(user.focusAreas || ["🤖 AI & Tech", "🏃 Health", "🎨 Design"]).map((area, idx) => (
+                    <span key={idx} className="badge badge-indigo">{area}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Stats Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+            <div className="card" style={{ textAlign: 'center' }}><div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#10A37F' }}>{journals.length}</div><div style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Total Journals</div></div>
+            <div className="card" style={{ textAlign: 'center' }}><div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#22C55E' }}>{goals.length}</div><div style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Tracked Goals</div></div>
+            <div className="card" style={{ textAlign: 'center' }}><div style={{ fontSize: '2.2rem', fontWeight: 800, color: '#F59E0B' }}>{achievements.length}</div><div style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Achievements</div></div>
+          </div>
+
+        </div>
+      );
+    }
+
+    // 9. SETTINGS VIEW
+    function SettingsView({ theme, onToggleTheme, data, onReset, onLogout }) {
+      const handleExport = () => {
+        const jsonStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(data, null, 2))}`;
+        const a = document.createElement('a');
+        a.href = jsonStr;
+        a.download = `myjournal_export_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+      };
+
+      return (
+        <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          <h2>Settings & Preferences</h2>
+
+          <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3>Appearance Theme</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Current mode: <strong>{theme}</strong></p>
+            </div>
+            <button onClick={onToggleTheme} className="btn-secondary">Switch Theme</button>
+          </div>
+
+          <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3>Export Journals</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Download full raw JSON backup of all journal entries</p>
+            </div>
+            <button onClick={handleExport} className="btn-primary">Export JSON</button>
+          </div>
+
+          <div className="card" style={{ border: '1px solid rgba(244,63,94,0.3)', background: 'rgba(244,63,94,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ color: '#F43F5E' }}>Delete Account / Reset Data</h3>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Reset app storage to initial demo state</p>
+            </div>
+            <button onClick={() => { if(confirm("Reset all data?")) onReset(); }} style={{ background: '#F43F5E', color: '#fff', border: 'none', padding: '0.65rem 1.25rem', borderRadius: '12px', cursor: 'pointer', fontWeight: 600 }}>Reset Data</button>
+          </div>
+        </div>
+      );
+    }
+
+    // AUTH VIEW
+    function AuthView({ onLogin }) {
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="glass-card" style={{ width: '100%', maxWidth: '420px', padding: '2.5rem', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800 }}>MyJournal ChatGPT</h1>
+            <p style={{ color: 'var(--text-muted)' }}>"Your personal ChatGPT OpenAI journal that remembers, understands, and grows with you."</p>
+            <button onClick={onLogin} className="btn-primary" style={{ justifyContent: 'center' }}>Sign In / Continue Demo</button>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
