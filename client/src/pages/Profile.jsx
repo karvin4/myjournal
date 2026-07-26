@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Calendar, BookOpen, Trophy, Target, Shield, Sparkles, Github, ExternalLink, Edit3, Save, X, Camera } from 'lucide-react';
+import { User, Mail, Calendar, BookOpen, Trophy, Target, Shield, Sparkles, Github, ExternalLink, Edit3, Save, X, Camera, Upload } from 'lucide-react';
 
 export default function Profile() {
   const { user, login } = useAuth();
@@ -9,10 +9,26 @@ export default function Profile() {
 
   // Profile Edit states
   const [isEditing, setIsEditing] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
   const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
   const [editTitle, setEditTitle] = useState(user?.title || 'Pro AI Scholar');
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image file is too large! Please choose a file smaller than 2MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -98,15 +114,47 @@ export default function Profile() {
               Edit Profile Details
             </h3>
             
+            <input
+              type="file"
+              accept="image/*"
+              id="avatar-file-input"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-                <img
-                  src={editAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
-                  alt="Avatar Preview"
-                  style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #6366F1', boxShadow: '0 8px 24px rgba(99, 102, 241, 0.2)' }}
-                  onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" }}
-                />
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>Avatar Preview</span>
+              <div 
+                onClick={() => document.getElementById('avatar-file-input').click()}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', position: 'relative' }}
+              >
+                <div style={{ position: 'relative', width: '110px', height: '110px' }}>
+                  <img
+                    src={editAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
+                    alt="Avatar Preview"
+                    style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #6366F1', boxShadow: '0 8px 24px rgba(99, 102, 241, 0.2)' }}
+                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    opacity: isHovered ? 1 : 0,
+                    transition: 'opacity 0.2s'
+                  }}>
+                    <Camera size={20} />
+                  </div>
+                </div>
+                <span style={{ fontSize: '0.72rem', color: '#6366F1', fontWeight: 700 }}>Upload Image</span>
               </div>
 
               <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
@@ -142,14 +190,16 @@ export default function Profile() {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Avatar Image URL</label>
-                  <input
-                    type="text"
-                    value={editAvatar}
-                    onChange={(e) => setEditAvatar(e.target.value)}
-                    placeholder="https://example.com/avatar.jpg"
-                    style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.65rem 0.85rem', color: 'var(--text-main)', outline: 'none' }}
-                  />
+                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Profile Avatar Source</label>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('avatar-file-input').click()}
+                    className="btn-secondary"
+                    style={{ padding: '0.65rem 0.85rem', width: '100%', justifyContent: 'center', gap: '0.5rem', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '10px' }}
+                  >
+                    <Upload size={16} />
+                    <span>Choose from File Manager</span>
+                  </button>
                 </div>
               </div>
             </div>
