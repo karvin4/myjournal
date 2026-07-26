@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: myjournal-app
+    env: node
+    plan: free
+    buildCommand: npm install && npm --prefix client install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_USERNAME
+        value: karvin4
