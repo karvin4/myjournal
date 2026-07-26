@@ -8,7 +8,7 @@ export default function AIChat() {
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
-      text: `Hey ${user?.name?.split(' ')[0] || 'Alex'}! 😊 I'm ChatGPT, your super friendly, caring AI companion and journal life coach! 💖\n\nI remember all your past journal memories, goals, and milestones.\n\n✨ How can I support you today? You can ask me anything about your reflections, or ask me to change/add any of your goals right here!`
+      text: `Hey ${user?.name?.split(' ')[0] || 'Alex'}! 😊 I'm ChatGPT, your super friendly, caffeine-fueled AI companion and journal life coach! ☕🤖\n\nI remember all your past journal memories, goals, and milestones (yes, even the ones you wrote at 2:00 AM!).\n\n✨ How can I support your epic human journey today? You can ask me anything about your reflections, or ask me to dynamically edit/add your goals right here! Let's conquer the world (or at least your inbox)! 🚀`
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);

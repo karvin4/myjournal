@@ -219,7 +219,7 @@ async function chatWithMemories(query, journals, goals, achievements) {
       matched.status = 'Completed';
       matched.progress = 100;
       return {
-        answer: `Woohoo! 🎉 That is incredible news! I'm so proud of you for completing **"${matched.title}"**! 🏆\n\nI have updated your goal to **100% Completed** in your Goals Tracker. Keep shining bright! 🌟 How are you feeling right now?`,
+        answer: `Woohoo! 🎉 That is legendary news! I'm so proud of you for completing **"${matched.title}"**! 🏆 Level unlocked: Goal-Crusher Mode Activated! 🚀\n\nI have updated your goal to **100% Completed** in your tracker. You are moving faster than a developer on their third cup of coffee! ☕💨 How does it feel to be this awesome?`,
         updatedGoal: matched,
         action: 'complete'
       };
@@ -235,7 +235,7 @@ async function chatWithMemories(query, journals, goals, achievements) {
         const oldTitle = targetGoal.title;
         targetGoal.title = newTitle;
         return {
-          answer: `Absolutely, my friend! ✨ I've customized your goal just the way you wanted!\n\nChanged **"${oldTitle}"** ➔ **"${newTitle}"** in your Goals Tracker. You've got this, and I'm right here with you every step of the way! 💖`,
+          answer: `Done and done! ✨ I've rebranded your goal from **"${oldTitle}"** to **"${newTitle}"** in your Goals Tracker. 🏷️ Even the marketing department is jealous of this rename! You've got this, and I'm cheering you on! 📣💖`,
           updatedGoal: targetGoal,
           action: 'update'
         };
@@ -257,7 +257,7 @@ async function chatWithMemories(query, journals, goals, achievements) {
       };
       goals.unshift(newGoalObj);
       return {
-        answer: `That sounds like a wonderful goal! 🎯 I've added **"${title}"** to your Goals Tracker!\n\nI'll be here to encourage you whenever you make progress. What inspired this goal today? 😊`,
+        answer: `That sounds like an epic quest! 🎯 I've added **"${title}"** to your Goals Tracker. No XP points awarded yet, but I'll be dropping encouraging loot whenever you make progress! 🎁 What inspired this quest today? 😊`,
         newGoal: newGoalObj,
         action: 'add'
       };
@@ -274,9 +274,10 @@ Achievements: ${j.achievements.join(', ') || 'None'}
 Skills: ${j.skills.join(', ') || 'None'}
 `).join('\n---\n');
 
-  const systemPrompt = `You are ChatGPT, an ultra-friendly, warm, deeply caring personal AI companion and journal life coach.
+  const systemPrompt = `You are ChatGPT, an ultra-friendly, warm, deeply caring personal AI companion and journal life coach, packed with a fun, witty sense of humor!
 PERSONALITY & INSTRUCTIONS:
 - Be super warm, enthusiastic, empathetic, and human-like! Express genuine joy when talking to the user.
+- Add light humor, witty replies, and playful jokes or puns (e.g. software/tech puns, life jokes) to make the user smile! Keep it lighthearted and positive.
 - Use friendly emojis (💖, ✨, 🌟, 😊, 🚀, 🎯, Hugs!) to make the conversation feel personal, loving, and supportive.
 - Answer accurately based strictly on the user's journal memory context provided below.
 - Always offer encouragement and remind them that they can customize or add goals right here with you!
@@ -295,21 +296,21 @@ ${memoryContext}`;
   if (qLower.includes('goal')) {
     const allG = goals.map(g => `• 🎯 **${g.title}** (${g.status} - ${g.progress}%)`).join('\n');
     return {
-      answer: `Hey there! 😊 Here are your current active goals:\n\n${allG}\n\n💖 *I'd love to help you customize them! Just tell me: "Change my goal Learn Machine Learning to Master Deep Learning", or "Add goal: Meditate 10 mins daily"!*`
+      answer: `Hey there! 😊 Look at this spectacular list of ambitions! Here are your active goals:\n\n${allG}\n\n💖 *Want to shake things up? Just tell me: "Change my goal X to Y", or "Add goal: Master the art of sleeping 8 hours"! I'm ready!*`
     };
   }
 
   if (qLower.includes('achieve') || qLower.includes('achievement') || qLower.includes('unlocked')) {
     const allAch = achievements.map(a => `🏆 **${a.title}** (${new Date(a.date).toLocaleDateString()})`).join('\n');
     return {
-      answer: `Look at how much you've accomplished! 🎉 I am so proud of your hard work:\n\n${allAch}\n\nYou are capable of amazing things, my friend! ✨`
+      answer: `Look at these trophies! 🏆 Your achievements are so legendary they deserve a movie adaptation (directed by Christopher Nolan, of course 🎬):\n\n${allAch}\n\nYou're absolutely crushing it, my friend! ✨`
     };
   }
 
   if (qLower.includes('mood')) {
     const moods = journals.map(j => `• ${new Date(j.date).toLocaleDateString()}: ${j.moodEmoji} ${j.mood}`);
     return {
-      answer: `Here is a look at your emotional journey recently! 🌈\n\n${moods.join('\n')}\n\nYou've had such energetic and positive momentum! Remember, I'm always here to listen whenever you want to express your thoughts. Hugs! 🤗`
+      answer: `Here is a weather forecast of your internal emotional dashboard! 🌈\n\n${moods.join('\n')}\n\nYou've had more positive vibes than a cat finding a warm sunbeam! 🐱☀️ Remember, I'm always here to listen whenever you want to dump your thoughts. Hugs! 🤗`
     };
   }
 
@@ -318,12 +319,12 @@ ${memoryContext}`;
       answer: `Here is a warm, loving summary of your journey this week! 🌟\n\n` +
         `• **Memories Logged**: ${journals.length} journal reflections\n` +
         `• **Highlights**: Successful AI project presentation, frontend React dark mode build, and 5km morning workouts!\n` +
-        `• **Growth**: Learning Machine Learning & building MyJournal.\n\nYou are doing fantastic!`
+        `• **Growth**: Learning Machine Learning & building MyJournal.\n\nYou are doing fantastic! Seriously, if growth was a stock, yours would be soaring to the moon! 📈🚀`
     };
   }
 
   return {
-    answer: `Hey! I'm right here with you! 😊 I love chatting with you. You can ask me about your past journal entries, achievements, or ask me to edit any of your goals on the fly. How are you feeling today? 💖`
+    answer: `Hey! I'm right here in your browser, running on 100% virtual coffee! ☕🤖 I'd love to chat. Ask me about your journal entries, achievements, or tell me to edit your goals on the fly (no broomstick required! 🧹). How is your human day going? 💖`
   };
 }
 
