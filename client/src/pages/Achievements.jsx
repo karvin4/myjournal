@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Calendar, Sparkles, Award, Star, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Award, Calendar, Star, Feather, ExternalLink } from 'lucide-react';
 
 export default function Achievements() {
   const [achievements, setAchievements] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,107 +15,168 @@ export default function Achievements() {
         setAchievements(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Failed to fetch achievements:", err);
+      } finally {
+        setLoading(false);
       }
     }
     fetchAchievements();
   }, []);
 
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-fade-in" style={{
+      width: '100%',
+      maxWidth: '1150px',
+      margin: '0 auto',
+      padding: '1.5rem 2rem 3.5rem 2rem',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1.75rem'
+    }}>
       
       {/* Header */}
       <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#F59E0B', fontWeight: 700, fontSize: '0.88rem', marginBottom: '0.25rem' }}>
-          <Trophy size={18} />
-          <span>AI TROPHY CABINET</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--warning)', fontSize: '13px', fontWeight: 600, fontFamily: 'var(--font-sans)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <Award size={14} />
+          <span>Personal Cabinet</span>
         </div>
-        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>
-          Achievements & Milestones
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '34px', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.01em', color: 'var(--text-main)', marginTop: '0.15rem' }}>
+          Milestones & Breakthroughs
         </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '0.25rem' }}>
-          Milestones, victories, and breakthrough moments automatically captured from your journals.
+        <p style={{ color: 'var(--text-muted)', fontSize: '15px', lineHeight: 1.6, marginTop: '0.25rem' }}>
+          Meaningful achievements and personal victories extracted directly from your daily reflections.
         </p>
       </div>
 
-      {/* Hero Achievement Highlight Banner */}
-      <div className="glass-card" style={{
-        padding: '2rem',
-        background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(99, 102, 241, 0.12) 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '1.5rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '20px',
-            background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 8px 24px rgba(245, 158, 11, 0.4)'
-          }}>
-            <Award size={34} />
-          </div>
-          <div>
-            <span className="badge badge-amber" style={{ marginBottom: '0.35rem' }}>Master Milestone</span>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{achievements.length} Total Milestones Unlocked</h3>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Keep writing entries to auto-detect new accomplishments!</p>
-          </div>
+      {/* Hero Metric Tile */}
+      <div className="paper-card" style={{ padding: '1.5rem 1.75rem', display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        <div style={{
+          width: '52px',
+          height: '52px',
+          borderRadius: 'var(--radius-md)',
+          background: 'var(--warning-light)',
+          color: 'var(--warning)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
+          <Award size={26} />
+        </div>
+        <div>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-main)' }}>
+            {achievements.length} Total Milestones Recognized
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+            Your personal milestone collection is built automatically from your journal entries.
+          </p>
         </div>
       </div>
 
-      {/* Achievement Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
-        {achievements.map((item) => (
-          <div
-            key={item.id}
-            className="glass-card"
-            style={{
-              padding: '1.75rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              borderTop: '4px solid #F59E0B'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span className="badge badge-amber">
-                <Star size={14} />
-                {item.category || 'Milestone'}
-              </span>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Calendar size={14} />
-                {new Date(item.date).toLocaleDateString()}
-              </div>
-            </div>
-
-            <div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.4rem' }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                {item.description || 'Extracted directly from your daily journal reflections.'}
-              </p>
-            </div>
-
-            <div style={{ marginTop: 'auto', paddingTop: '0.85rem', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.78rem', color: '#6366F1', fontWeight: 600 }}>Linked to Memory</span>
-              <button
-                onClick={() => navigate('/timeline')}
-                style={{ background: 'none', border: 'none', color: '#6366F1', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-              >
-                <span>View Journal</span>
-                <ArrowRight size={14} />
-              </button>
-            </div>
+      {/* Empty State vs Achievements Grid */}
+      {loading ? (
+        <div className="paper-card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+          Loading your milestones...
+        </div>
+      ) : achievements.length === 0 ? (
+        <div className="paper-card" style={{
+          padding: '4rem 2rem',
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '1.25rem',
+          background: 'var(--bg-card)',
+          border: '1px dashed var(--border-color)',
+          borderRadius: 'var(--radius-lg)'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: 'var(--radius-full)',
+            background: 'var(--warning-light)',
+            color: 'var(--warning)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Award size={32} />
           </div>
-        ))}
-      </div>
+          <div style={{ maxWidth: '480px' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
+              0 Total Milestones Recognized
+            </h3>
+            <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+              Your meaningful achievements will appear here as you record them in your journal. Start writing your journal to build your personal milestone collection.
+            </p>
+          </div>
+          <button onClick={() => navigate('/write')} className="btn-primary" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
+            <Feather size={16} /> <span>Write a Journal Entry</span>
+          </button>
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.25rem' }}>
+          {achievements.map((item) => {
+            const dateStr = item.date ? new Date(item.date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+            return (
+              <div key={item.id} className="paper-card" style={{
+                padding: '1.5rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '1.25rem'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span className="badge badge-warning" style={{ fontSize: '0.75rem' }}>
+                      <Star size={12} /> {item.category || 'Milestone'}
+                    </span>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--text-subtle)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <Calendar size={12} /> {dateStr}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.35 }}>
+                    {item.title}
+                  </h3>
+
+                  {item.description && (
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.55 }}>
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Source Link */}
+                {item.relatedJournalId && (
+                  <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
+                    <button
+                      onClick={() => navigate('/timeline', { state: { highlightId: item.relatedJournalId } })}
+                      className="btn-ghost"
+                      style={{
+                        padding: 0,
+                        fontSize: '0.8rem',
+                        color: 'var(--accent)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer'
+                      }}
+                      title="Open source journal entry"
+                    >
+                      <span>Extracted from journal entry on {dateStr}</span>
+                      <ExternalLink size={12} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
     </div>
   );

@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Calendar, BookOpen, Trophy, Target, Shield, Sparkles, Github, ExternalLink, Edit3, Save, X, Camera, Upload } from 'lucide-react';
+import { User, Mail, Calendar, BookOpen, Award, Compass, Github, Edit3, Save, X, Camera } from 'lucide-react';
 
 export default function Profile() {
   const { user, login } = useAuth();
   const [stats, setStats] = useState({ journals: 0, goals: 0, achievements: 0 });
   const [githubConn, setGithubConn] = useState({ connected: false });
 
-  // Profile Edit states
   const [isEditing, setIsEditing] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [editName, setEditName] = useState(user?.name || '');
   const [editEmail, setEditEmail] = useState(user?.email || '');
   const [editAvatar, setEditAvatar] = useState(user?.avatar || '');
-  const [editTitle, setEditTitle] = useState(user?.title || 'Pro AI Scholar');
+  const [editTitle, setEditTitle] = useState(user?.title || 'Journal Scholar');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -73,204 +71,127 @@ export default function Profile() {
     setIsEditing(false);
   };
 
-  const handleCancel = () => {
-    setEditName(user?.name || '');
-    setEditEmail(user?.email || '');
-    setEditAvatar(user?.avatar || '');
-    setEditTitle(user?.title || 'Pro AI Scholar');
-    setIsEditing(false);
-  };
-
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div className="animate-fade-in reading-width" style={{
+      padding: '2.5rem 1.5rem 4rem 1.5rem',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '2rem'
+    }}>
       
       {/* Header */}
       <div>
-        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>
-          User Profile
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', fontSize: '14px', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>
+          <User size={14} />
+          <span>Stationery Identity</span>
+        </div>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '38px', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.01em', color: 'var(--text-main)', marginTop: '0.2rem' }}>
+          Author Profile
         </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '0.25rem' }}>
-          Manage your personal details and view your account statistics.
-        </p>
       </div>
 
-      {/* Profile Card */}
-      <div className="glass-card" style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative' }}>
-        
-        {!isEditing && (
+      {/* Main Profile Card */}
+      <div className="paper-card" style={{ padding: '2rem 2.25rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+            <div style={{ position: 'relative' }}>
+              <img
+                src={isEditing ? editAvatar || user?.avatar : user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
+                alt="Profile"
+                style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border-color)' }}
+              />
+              {isEditing && (
+                <label style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  background: 'var(--accent)',
+                  color: '#fff',
+                  borderRadius: '50%',
+                  width: '26px',
+                  height: '26px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}>
+                  <Camera size={13} />
+                  <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+                </label>
+              )}
+            </div>
+
+            <div>
+              <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '24px', fontWeight: 600, lineHeight: 1.25, color: 'var(--text-main)' }}>{user?.name || "Alex Morgan"}</h3>
+              <p style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)' }}>{user?.email || "alex@example.com"}</p>
+              <span className="badge badge-accent" style={{ marginTop: '0.35rem' }}>
+                {user?.title || "Journal Scholar"}
+              </span>
+            </div>
+          </div>
+
           <button
-            onClick={() => setIsEditing(true)}
-            className="btn-secondary"
-            style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', padding: '0.5rem 1rem', fontSize: '0.85rem', gap: '0.35rem' }}
+            onClick={() => setIsEditing(!isEditing)}
+            className={isEditing ? "btn-secondary" : "btn-primary"}
+            style={{ fontSize: '16px' }}
           >
-            <Edit3 size={15} />
-            <span>Edit Profile</span>
+            {isEditing ? <X size={15} /> : <Edit3 size={15} />}
+            <span>{isEditing ? "Cancel" : "Edit Profile"}</span>
           </button>
-        )}
-
-        {isEditing ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-              Edit Profile Details
-            </h3>
-            
-            <input
-              type="file"
-              accept="image/*"
-              id="avatar-file-input"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
-
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-              <div 
-                onClick={() => document.getElementById('avatar-file-input').click()}
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', position: 'relative' }}
-              >
-                <div style={{ position: 'relative', width: '110px', height: '110px' }}>
-                  <img
-                    src={editAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
-                    alt="Avatar Preview"
-                    style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #6366F1', boxShadow: '0 8px 24px rgba(99, 102, 241, 0.2)' }}
-                    onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '50%',
-                    background: 'rgba(0,0,0,0.5)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#fff',
-                    opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.2s'
-                  }}>
-                    <Camera size={20} />
-                  </div>
-                </div>
-                <span style={{ fontSize: '0.72rem', color: '#6366F1', fontWeight: 700 }}>Upload Image</span>
-              </div>
-
-              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Display Name</label>
-                  <input
-                    type="text"
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.65rem 0.85rem', color: 'var(--text-main)', outline: 'none' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Email Address</label>
-                  <input
-                    type="email"
-                    value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
-                    style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.65rem 0.85rem', color: 'var(--text-main)', outline: 'none' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Professional Title / Role</label>
-                  <input
-                    type="text"
-                    value={editTitle}
-                    onChange={(e) => setEditTitle(e.target.value)}
-                    placeholder="e.g. Pro AI Scholar, Software Engineer"
-                    style={{ background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0.65rem 0.85rem', color: 'var(--text-main)', outline: 'none' }}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-muted)' }}>Profile Avatar Source</label>
-                  <button
-                    type="button"
-                    onClick={() => document.getElementById('avatar-file-input').click()}
-                    className="btn-secondary"
-                    style={{ padding: '0.65rem 0.85rem', width: '100%', justifyContent: 'center', gap: '0.5rem', background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '10px' }}
-                  >
-                    <Upload size={16} />
-                    <span>Choose from File Manager</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
-              <button onClick={handleCancel} className="btn-secondary" style={{ padding: '0.55rem 1.25rem', fontSize: '0.9rem' }}>
-                <X size={16} />
-                <span>Cancel</span>
-              </button>
-              <button onClick={handleSave} className="btn-primary" style={{ padding: '0.55rem 1.25rem', fontSize: '0.9rem' }}>
-                <Save size={16} />
-                <span>Save Changes</span>
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap', width: '100%' }}>
-            <img
-              src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
-              alt="Profile Avatar"
-              style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #6366F1', boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)' }}
-            />
-            
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-                <h3 style={{ fontSize: '1.75rem', fontWeight: 800 }}>{user?.name || "Alex Morgan"}</h3>
-                <span className="badge badge-emerald">
-                  <Shield size={14} /> {user?.title || "Pro AI Scholar"}
-                </span>
-              </div>
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', color: 'var(--text-muted)', fontSize: '0.92rem', marginTop: '0.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Mail size={16} color="#6366F1" />
-                  <span>{user?.email || "alex.morgan@example.com"}</span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Calendar size={16} color="#22C55E" />
-                  <span>Member Since {user?.memberSince || "July 2026"}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Statistics Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
-        
-        <div className="card" style={{ padding: '1.75rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'rgba(99, 102, 241, 0.12)', color: '#6366F1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BookOpen size={28} />
-          </div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>{stats.journals}</div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Journal Entries</div>
         </div>
 
-        <div className="card" style={{ padding: '1.75rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'rgba(34, 197, 94, 0.12)', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Target size={28} />
+        {/* Edit Form */}
+        {isEditing && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)' }}>
+            <div>
+              <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-muted)' }}>Display Name</label>
+              <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-muted)' }}>Email Address</label>
+              <input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-muted)' }}>Title / Tagline</label>
+              <input type="text" value={editTitle} onChange={(e) => setEditTitle(e.target.value)} />
+            </div>
+            <button onClick={handleSave} className="btn-primary" style={{ alignSelf: 'flex-start' }}>
+              <Save size={15} /> Save Changes
+            </button>
           </div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>{stats.goals}</div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Active Goals</div>
-        </div>
+        )}
 
-        <div className="card" style={{ padding: '1.75rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '56px', height: '56px', borderRadius: '18px', background: 'rgba(245, 158, 11, 0.12)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Trophy size={28} />
+        {/* Stats Row */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: '1rem',
+          paddingTop: '1rem',
+          borderTop: '1px solid var(--border-color)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <BookOpen size={20} color="var(--accent)" />
+            <div>
+              <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)' }}>Journals</div>
+              <div style={{ fontSize: '34px', fontWeight: 700, fontFamily: 'var(--font-sans)', lineHeight: 1.15 }}>{stats.journals}</div>
+            </div>
           </div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>{stats.achievements}</div>
-          <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Unlocked Achievements</div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Compass size={20} color="var(--success)" />
+            <div>
+              <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)' }}>Goals</div>
+              <div style={{ fontSize: '34px', fontWeight: 700, fontFamily: 'var(--font-sans)', lineHeight: 1.15 }}>{stats.goals}</div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <Award size={20} color="var(--warning)" />
+            <div>
+              <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)' }}>Milestones</div>
+              <div style={{ fontSize: '34px', fontWeight: 700, fontFamily: 'var(--font-sans)', lineHeight: 1.15 }}>{stats.achievements}</div>
+            </div>
+          </div>
         </div>
 
       </div>

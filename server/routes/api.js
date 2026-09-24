@@ -50,7 +50,7 @@ router.get('/journal/:id', (req, res) => {
 // POST /api/journal - Save entry & perform AI Analysis
 router.post('/journal', async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, mood, moodEmoji, date, day } = req.body;
     if (!content || !content.trim()) {
       return res.status(400).json({ error: "Journal content cannot be empty" });
     }
@@ -59,12 +59,17 @@ router.post('/journal', async (req, res) => {
     const aiAnalysis = await analyzeJournal(content);
 
     const newJournalId = "j-" + Date.now();
+    const finalDate = date ? new Date(date).toISOString() : new Date().toISOString();
+    const finalMood = mood || aiAnalysis.mood || "Happy";
+    const finalMoodEmoji = moodEmoji || aiAnalysis.moodEmoji || "😊";
+
     const newJournal = {
       id: newJournalId,
-      date: new Date().toISOString(),
+      date: finalDate,
+      day: day || new Date(finalDate).toLocaleDateString('en-US', { weekday: 'long' }),
       content: content.trim(),
-      mood: aiAnalysis.mood || "Happy",
-      moodEmoji: aiAnalysis.moodEmoji || "😊",
+      mood: finalMood,
+      moodEmoji: finalMoodEmoji,
       goals: aiAnalysis.goals || [],
       achievements: aiAnalysis.achievements || [],
       skills: aiAnalysis.skills || [],
@@ -83,7 +88,7 @@ router.post('/journal', async (req, res) => {
         store.goals.unshift({
           id: "g-" + Date.now() + "-" + idx,
           title: gTitle,
-          createdDate: new Date().toISOString(),
+          createdDate: finalDate,
           status: "In Progress",
           progress: 25,
           priority: "High",
@@ -93,16 +98,23 @@ router.post('/journal', async (req, res) => {
       });
     }
 
-    if (aiAnalysis.achievements && aiAnalysis.achievements.length > 0) {
-      aiAnalysis.achievements.forEach((aTitle, idx) => {
-        store.achievements.unshift({
-          id: "a-" + Date.now() + "-" + idx,
-          title: aTitle,
-          date: new Date().toISOString(),
-          relatedJournalId: newJournalId,
-          category: "Milestone",
-          description: `Extracted from journal entry on ${new Date().toLocaleDateString()}`
-        });
+    if (aiAnalysis.achievements && Array.isArray(aiAnalysis.achievements) && aiAnalysis.achievements.length > 0) {
+      aiAnalysis.achievements.forEach((achItem, idx) => {
+        const title = typeof achItem === 'string' ? achItem : achItem.title;
+        const description = typeof achItem === 'object' && achItem.description ? achItem.description : `Extracted from journal reflection on ${new Date(finalDate).toLocaleDateString()}`;
+        const category = typeof achItem === 'object' && achItem.category ? achItem.category : "Milestone";
+
+        if (title && title.trim()) {
+          store.achievements.unshift({
+            id: "a-" + Date.now() + "-" + idx,
+            title: title.trim(),
+            description: description,
+            category: category,
+            date: finalDate,
+            relatedJournalId: newJournalId,
+            createdAt: new Date().toISOString()
+          });
+        }
       });
     }
 
@@ -110,12 +122,101 @@ router.post('/journal', async (req, res) => {
 
     res.status(201).json({
       journal: newJournal,
-      analysis: aiAnalysis
+      analysis: {
+        ...aiAnalysis,
+        mood: finalMood,
+        moodEmoji: finalMoodEmoji
+      }
     });
   } catch (error) {
     console.error("Journal save error:", error);
     res.status(500).json({ error: "Failed to process journal entry" });
   }
+});
+
+// DELETE /api/journal/:id - Soft delete entry
+router.delete('/journal/:id', (req, res) => {
+  const store = loadStore();
+  const entry = store.journals.find(j => j.id === req.params.id);
+  if (!entry) return res.status(404).json({ error: "Journal entry not found" });
+  entry.isDeleted = true;
+  entry.deletedAt = new Date().toISOString();
+  saveStore(store);
+  res.json({ message: "Journal entry moved to trash", entry });
+});
+
+// POST /api/journal/:id/restore - Restore soft-deleted entry
+router.post('/journal/:id/restore', (req, res) => {
+  const store = loadStore();
+  const entry = store.journals.find(j => j.id === req.params.id);
+  if (!entry) return res.status(404).json({ error: "Journal entry not found" });
+  entry.isDeleted = false;
+  delete entry.deletedAt;
+  saveStore(store);
+  res.json({ message: "Journal entry restored", entry });
+});
+
+// DELETE /api/journal/:id/permanent - Permanent delete entry
+router.delete('/journal/:id/permanent', (req, res) => {
+  const store = loadStore();
+  const index = store.journals.findIndex(j => j.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: "Journal entry not found" });
+  store.journals.splice(index, 1);
+  saveStore(store);
+  res.json({ message: "Journal entry permanently deleted", id: req.params.id });
+});
+
+// POST /api/journal/bulk-delete - Bulk soft delete
+router.post('/journal/bulk-delete', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "Invalid request payload" });
+  }
+  const store = loadStore();
+  const now = new Date().toISOString();
+  let count = 0;
+  store.journals.forEach(j => {
+    if (ids.includes(j.id)) {
+      j.isDeleted = true;
+      j.deletedAt = now;
+      count++;
+    }
+  });
+  saveStore(store);
+  res.json({ message: `${count} journal entries moved to trash`, ids });
+});
+
+// POST /api/journal/bulk-restore - Bulk restore
+router.post('/journal/bulk-restore', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "Invalid request payload" });
+  }
+  const store = loadStore();
+  let count = 0;
+  store.journals.forEach(j => {
+    if (ids.includes(j.id)) {
+      j.isDeleted = false;
+      delete j.deletedAt;
+      count++;
+    }
+  });
+  saveStore(store);
+  res.json({ message: `${count} journal entries restored`, ids });
+});
+
+// POST /api/journal/bulk-permanent-delete - Bulk permanent delete
+router.post('/journal/bulk-permanent-delete', (req, res) => {
+  const { ids } = req.body;
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "Invalid request payload" });
+  }
+  const store = loadStore();
+  const initialLen = store.journals.length;
+  store.journals = store.journals.filter(j => !ids.includes(j.id));
+  const count = initialLen - store.journals.length;
+  saveStore(store);
+  res.json({ message: `${count} journal entries permanently deleted`, ids });
 });
 
 // GET /api/timeline
@@ -133,13 +234,29 @@ router.get('/goals', (req, res) => {
 // POST /api/goals - Add custom goal
 router.post('/goals', (req, res) => {
   const store = loadStore();
-  const { title, priority, category } = req.body;
+  const { title, priority, category, targetDays, startDate, targetDate } = req.body;
+
+  const finalTargetDays = parseInt(targetDays, 10) || 30;
+  const todayStr = new Date().toISOString().split('T')[0];
+  const finalStartDate = startDate || todayStr;
+
+  let finalTargetDate = targetDate;
+  if (!finalTargetDate) {
+    const sDate = new Date(finalStartDate);
+    sDate.setDate(sDate.getDate() + finalTargetDays);
+    finalTargetDate = sDate.toISOString().split('T')[0];
+  }
+
   const newGoal = {
     id: "g-" + Date.now(),
     title: title || "New Goal",
     createdDate: new Date().toISOString(),
+    startDate: finalStartDate,
+    targetDate: finalTargetDate,
+    targetDays: finalTargetDays,
+    completedDates: [],
     status: "In Progress",
-    progress: 10,
+    progress: 0,
     priority: priority || "High",
     category: category || "Personal Growth"
   };
@@ -154,7 +271,21 @@ router.put('/goals/:id', (req, res) => {
   const idx = store.goals.findIndex(g => g.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Goal not found" });
 
-  store.goals[idx] = { ...store.goals[idx], ...req.body };
+  const updated = { ...store.goals[idx], ...req.body };
+
+  const targetDays = parseInt(updated.targetDays, 10) || 30;
+  const completedCount = Array.isArray(updated.completedDates) ? updated.completedDates.length : 0;
+
+  if (updated.status === 'Completed') {
+    updated.progress = 100;
+  } else if (completedCount >= targetDays) {
+    updated.status = 'Completed';
+    updated.progress = 100;
+  } else {
+    updated.progress = Math.min(100, Math.round((completedCount / targetDays) * 100 * 100) / 100);
+  }
+
+  store.goals[idx] = updated;
   saveStore(store);
   res.json(store.goals[idx]);
 });
@@ -170,27 +301,42 @@ router.delete('/goals/:id', (req, res) => {
 // GET /api/achievements
 router.get('/achievements', (req, res) => {
   const store = loadStore();
-  res.json(store.achievements);
+  const validJournalIds = new Set(
+    (store.journals || [])
+      .filter(j => !j.isDeleted)
+      .map(j => j.id)
+  );
+
+  const activeAchievements = (store.achievements || []).filter(a => {
+    if (!a.relatedJournalId) return true;
+    return validJournalIds.has(a.relatedJournalId);
+  });
+
+  res.json(activeAchievements);
 });
 
-// POST /api/chat - RAG Memory & Interactive Goal Customization Chat Endpoint
+// POST /api/chat - Karr Best Friend & Active RAG Engine Endpoint
 router.post('/chat', async (req, res) => {
   try {
-    const { query } = req.body;
-    if (!query || !query.trim()) {
-      return res.status(400).json({ error: "Query is required" });
+    const { query, message, botName, history } = req.body;
+    const userQuery = message || query;
+
+    if (!userQuery || !userQuery.trim()) {
+      return res.status(400).json({ error: "Query or message is required" });
     }
 
     const store = loadStore();
-    const result = await chatWithMemories(query.trim(), store.journals, store.goals, store.achievements);
+    const result = await chatWithMemories(userQuery.trim(), store, botName || 'Karr', history || []);
 
-    // Save updated goals if chat modified them
+    // Save updated store after Karr actions
     saveStore(store);
 
     res.json({
-      query: query.trim(),
+      query: userQuery.trim(),
       answer: result.answer,
-      updatedGoal: result.updatedGoal || result.newGoal || null,
+      intent: result.intent,
+      action: result.action,
+      updatedGoal: result.updatedGoal || null,
       goals: store.goals,
       timestamp: new Date().toISOString()
     });

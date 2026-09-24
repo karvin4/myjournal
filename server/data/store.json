@@ -1,0 +1,292 @@
+{
+  "journals": [
+    {
+      "id": "j-1785825874703",
+      "date": "2026-08-04T00:00:00.000Z",
+      "day": "Tuesday",
+      "content": "bbb",
+      "mood": "Calm",
+      "moodEmoji": "🌿",
+      "goals": [
+        "Continue personal growth & consistency"
+      ],
+      "achievements": [],
+      "skills": [],
+      "projects": [],
+      "events": [],
+      "ideas": [],
+      "people": [],
+      "tags": [
+        "Journal",
+        "Reflection"
+      ],
+      "summary": "bbb",
+      "isDeleted": true,
+      "deletedAt": "2026-09-23T07:24:30.709Z"
+    },
+    {
+      "id": "j-1785825873505",
+      "date": "2026-08-04T00:00:00.000Z",
+      "day": "Tuesday",
+      "content": "bbb",
+      "mood": "Calm",
+      "moodEmoji": "🌿",
+      "goals": [
+        "Continue personal growth & consistency"
+      ],
+      "achievements": [],
+      "skills": [],
+      "projects": [],
+      "events": [],
+      "ideas": [],
+      "people": [],
+      "tags": [
+        "Journal",
+        "Reflection"
+      ],
+      "summary": "bbb",
+      "isDeleted": true,
+      "deletedAt": "2026-09-23T07:24:30.709Z"
+    },
+    {
+      "id": "j-1785825870980",
+      "date": "2026-08-04T00:00:00.000Z",
+      "day": "Tuesday",
+      "content": "bbb",
+      "mood": "Calm",
+      "moodEmoji": "🌿",
+      "goals": [
+        "Continue personal growth & consistency"
+      ],
+      "achievements": [],
+      "skills": [],
+      "projects": [],
+      "events": [],
+      "ideas": [],
+      "people": [],
+      "tags": [
+        "Journal",
+        "Reflection"
+      ],
+      "summary": "bbb",
+      "isDeleted": true,
+      "deletedAt": "2026-09-23T07:24:30.709Z"
+    }
+  ],
+  "goals": [
+    {
+      "id": "g-1790226098527-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-09-24T05:01:38.526Z",
+      "status": "In Progress",
+      "progress": 3.33,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1790226098526",
+      "completedDates": [
+        "2026-09-24"
+      ]
+    },
+    {
+      "id": "g-1790226092785-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-09-24T05:01:32.766Z",
+      "status": "In Progress",
+      "progress": 3.33,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1790226092766",
+      "completedDates": [
+        "2026-09-24"
+      ]
+    },
+    {
+      "id": "g-1790226010719-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-09-24T05:00:10.719Z",
+      "status": "In Progress",
+      "progress": 3.33,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1790226010719",
+      "completedDates": [
+        "2026-09-24"
+      ]
+    },
+    {
+      "id": "g-1790226003984-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-09-24T05:00:03.965Z",
+      "status": "In Progress",
+      "progress": 3.33,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1790226003965",
+      "completedDates": [
+        "2026-09-24"
+      ]
+    },
+    {
+      "id": "g-1790224505547",
+      "title": "Learn Editing",
+      "createdDate": "2026-09-24T04:35:05.547Z",
+      "startDate": "2026-09-24",
+      "targetDate": "2026-10-24",
+      "targetDays": 30,
+      "completedDates": [
+        "2026-09-25",
+        "2026-09-24"
+      ],
+      "status": "In Progress",
+      "progress": 6.67,
+      "priority": "High",
+      "category": "Personal Growth"
+    },
+    {
+      "id": "g-1790148347652",
+      "title": "learn editing",
+      "createdDate": "2026-09-23T07:25:47.652Z",
+      "status": "In Progress",
+      "progress": 3.33,
+      "priority": "High",
+      "category": "Personal Growth",
+      "completedDates": [
+        "2026-09-24"
+      ]
+    },
+    {
+      "id": "g-1785825874703-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-08-04T00:00:00.000Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1785825874703"
+    },
+    {
+      "id": "g-1785825873505-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-08-04T00:00:00.000Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1785825873505"
+    },
+    {
+      "id": "g-1785825870983-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-08-04T00:00:00.000Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1785825870980"
+    },
+    {
+      "id": "g-1785228328757",
+      "title": "Learn Java",
+      "createdDate": "2026-07-28T08:45:28.757Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Learning"
+    },
+    {
+      "id": "g-1785213048834",
+      "title": "that to my goal",
+      "createdDate": "2026-07-28T04:30:48.834Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth"
+    },
+    {
+      "id": "g-1785212997487",
+      "title": "one goal to my goal tracker",
+      "createdDate": "2026-07-28T04:29:57.487Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth"
+    },
+    {
+      "id": "g-1785140319165-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-07-27T00:00:00.000Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1785140319165"
+    },
+    {
+      "id": "g-1785137457779-0",
+      "title": "Continue personal growth & consistency",
+      "createdDate": "2026-07-27T00:00:00.000Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Personal Growth",
+      "sourceJournalId": "j-1785137457779"
+    },
+    {
+      "id": "g-1",
+      "title": "Learn Machine Learning",
+      "createdDate": "2026-07-24T12:32:10.160Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Learning",
+      "sourceJournalId": "j-1"
+    },
+    {
+      "id": "g-2",
+      "title": "Master Glassmorphism UI",
+      "createdDate": "2026-07-25T12:32:10.160Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "Medium",
+      "category": "Design",
+      "sourceJournalId": "j-2"
+    },
+    {
+      "id": "g-3",
+      "title": "Run 5km 3x a week",
+      "createdDate": "2026-07-26T12:32:10.160Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Health",
+      "sourceJournalId": "j-3"
+    },
+    {
+      "id": "g-4",
+      "title": "Complete AI Project Presentation",
+      "createdDate": "2026-07-21T12:32:10.160Z",
+      "status": "Completed",
+      "progress": 100,
+      "priority": "High",
+      "category": "Academic",
+      "sourceJournalId": "j-1"
+    }
+  ],
+  "achievements": [],
+  "habits": [
+    {
+      "id": "h-1785233096692",
+      "title": "Drink 2L water daily",
+      "createdDate": "2026-07-28T10:04:56.692Z",
+      "type": "habit"
+    }
+  ],
+  "memories": [],
+  "moods": [
+    {
+      "date": "2026-07-28T08:45:04.400Z",
+      "text": "i'm but sad today"
+    }
+  ],
+  "userNickname": "macha"
+}

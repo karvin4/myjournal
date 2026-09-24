@@ -1,53 +1,85 @@
-import React, { useState } from 'react';
-import { Send, Bot, Sparkles, CheckCircle2, Heart } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Send, Sparkles, Edit3, Check, Feather } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function AIChat() {
   const { user } = useAuth();
+  const [botName, setBotName] = useState(() => localStorage.getItem('chatbotName') || 'Karr');
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState(botName);
+
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState([
     {
       sender: 'ai',
-      text: `Hey ${user?.name?.split(' ')[0] || 'Alex'}! 😊 I'm ChatGPT, your super friendly, caffeine-fueled AI companion and journal life coach! ☕🤖\n\nI remember all your past journal memories, goals, and milestones (yes, even the ones you wrote at 2:00 AM!).\n\n✨ How can I support your epic human journey today? You can ask me anything about your reflections, or ask me to dynamically edit/add your goals right here! Let's conquer the world (or at least your inbox)! 🚀`
+      text: `Hello ${user?.name?.split(' ')[0] || 'friend'}. I am your personal memory companion and reflection listener. Share whatever is on your mind today — from small reflections to major life goals.`
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const saveBotName = (name) => {
+    const clean = name.trim() || 'Karr';
+    setBotName(clean);
+    setTempName(clean);
+    localStorage.setItem('chatbotName', clean);
+    setIsEditingName(false);
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping]);
 
   const promptSuggestions = [
-    "Change my goal 'Learn Machine Learning' to 'Master Deep Learning & PyTorch'",
-    "Mark 'Run 5km 3x a week' as completed",
-    "Add goal: Read 20 pages of AI books daily",
-    "What are my active goals?",
-    "Summarize this week lovingly.",
-    "How has my mood evolved?"
+    "Reflect on my recent journal entries",
+    "What goals have I set recently?",
+    "Help me summarize my progress this week",
+    "I want to build a daily writing habit"
   ];
 
   const handleSend = async (textToSend) => {
-    const messageText = textToSend || query;
-    if (!messageText.trim() || isTyping) return;
+    const messageText = typeof textToSend === 'string' ? textToSend : query;
+    if (!messageText || !messageText.trim() || isTyping) return;
 
+    const trimmedText = messageText.trim();
     const userMsg = {
       sender: 'user',
-      text: messageText.trim(),
+      text: trimmedText,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
-    setMessages(prev => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     setQuery('');
     setIsTyping(true);
 
     try {
+      const historyPayload = newMessages.map(m => ({
+        role: m.sender === 'user' ? 'user' : 'assistant',
+        content: m.text
+      }));
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: messageText.trim() })
+        body: JSON.stringify({
+          message: trimmedText,
+          query: trimmedText,
+          botName,
+          history: historyPayload
+        })
       });
       const data = await res.json();
 
       const aiMsg = {
         sender: 'ai',
-        text: data.answer || "I'm right here with you! How else can I assist with your journal or goals today? 💖",
+        text: data.answer || `I am listening. What else would you like to reflect on?`,
         card: data.updatedGoal || null,
+        action: data.action || null,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -56,7 +88,7 @@ export default function AIChat() {
       console.error("Chat error:", err);
       setMessages(prev => [...prev, {
         sender: 'ai',
-        text: "I'm always here for you, my friend! 💖 Make sure your backend server is connected.",
+        text: `I am here with you. Please ensure the backend server is running.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     } finally {
@@ -65,53 +97,63 @@ export default function AIChat() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto', height: 'calc(100vh - 110px)', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <div className="animate-fade-in reading-width" style={{
+      padding: '2rem 1.5rem',
+      height: 'calc(100vh - 90px)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '1.25rem'
+    }}>
       
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '14px', background: 'linear-gradient(135deg, #10A37F, #22C55E)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 6px 18px rgba(16, 163, 127, 0.4)' }}>
-            <Bot size={24} />
+      {/* Header Bar */}
+      <div className="paper-card" style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: 'var(--radius-full)',
+            background: 'var(--accent-light)',
+            color: 'var(--accent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Sparkles size={18} />
           </div>
+
           <div>
-            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              ChatGPT OpenAI Companion <Heart size={20} color="#F43F5E" fill="#F43F5E" />
-            </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-              Super friendly, empathetic companion & instant goal customizer
-            </p>
+            {isEditingName ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <input
+                  type="text"
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') saveBotName(tempName); }}
+                  style={{ padding: '0.2rem 0.6rem', fontSize: '0.9rem', width: '120px' }}
+                />
+                <button onClick={() => saveBotName(tempName)} className="btn-ghost" style={{ padding: '0.2rem' }}>
+                  <Check size={14} />
+                </button>
+              </div>
+            ) : (
+              <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '20px', fontWeight: 600, lineHeight: 1.25, display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-main)' }}>
+                {botName}
+                <button onClick={() => setIsEditingName(true)} className="btn-ghost" style={{ padding: '0.2rem', color: 'var(--text-subtle)' }}>
+                  <Edit3 size={13} />
+                </button>
+              </h2>
+            )}
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Memory Companion</p>
           </div>
         </div>
-        <span className="badge badge-emerald" style={{ padding: '0.5rem 0.9rem' }}>
-          <Sparkles size={14} /> GPT 4o Best Friend Persona
+
+        <span className="badge badge-accent">
+          <span className="pulse-dot"></span> Active RAG
         </span>
       </div>
 
-      {/* Suggested Prompts Grid */}
-      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-        {promptSuggestions.map((prompt, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSend(prompt)}
-            style={{
-              padding: '0.4rem 0.85rem',
-              borderRadius: 'var(--radius-full)',
-              border: '1px solid var(--border-color)',
-              background: 'var(--bg-card)',
-              color: '#10A37F',
-              fontSize: '0.82rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'var(--transition-fast)'
-            }}
-          >
-            💬 {prompt}
-          </button>
-        ))}
-      </div>
-
-      {/* Chat Messages Container */}
-      <div className="glass-card" style={{
+      {/* Messages Scroll Area */}
+      <div className="paper-card paper-texture" style={{
         flex: 1,
         padding: '1.5rem',
         overflowY: 'auto',
@@ -126,89 +168,85 @@ export default function AIChat() {
               key={idx}
               style={{
                 display: 'flex',
-                justifyContent: isUser ? 'flex-end' : 'flex-start',
-                gap: '0.75rem'
+                flexDirection: 'column',
+                alignItems: isUser ? 'flex-end' : 'flex-start',
+                gap: '0.35rem'
               }}
             >
-              {!isUser && (
-                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #10A37F, #16A34A)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Bot size={20} />
-                </div>
-              )}
-
-              <div style={{ maxWidth: '78%' }}>
-                <div style={{
-                  padding: '1rem 1.25rem',
-                  borderRadius: isUser ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
-                  background: isUser ? 'linear-gradient(135deg, #10A37F 0%, #16A34A 100%)' : 'var(--bg-card)',
-                  color: isUser ? '#ffffff' : 'var(--text-main)',
-                  border: isUser ? 'none' : '1px solid var(--border-color)',
-                  boxShadow: isUser ? '0 4px 14px rgba(16, 163, 127, 0.35)' : 'var(--shadow-sm)',
-                  fontSize: '0.98rem',
-                  lineHeight: 1.6,
-                  whiteSpace: 'pre-wrap'
-                }}>
-                  {msg.text}
-                </div>
-
-                {msg.card && (
-                  <div style={{ marginTop: '0.5rem', padding: '0.85rem 1rem', background: 'rgba(16, 163, 127, 0.12)', border: '1px solid #10A37F', borderRadius: '14px', color: '#10A37F', fontSize: '0.85rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <CheckCircle2 size={16} />
-                    <span>Updated Goal: "{msg.card.title}"</span>
-                    <span className="badge badge-emerald" style={{ marginLeft: 'auto' }}>{msg.card.status} ({msg.card.progress}%)</span>
-                  </div>
-                )}
-
-                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.35rem', textAlign: isUser ? 'right' : 'left' }}>
-                  {msg.timestamp}
-                </div>
+              <div style={{
+                maxWidth: '82%',
+                padding: '0.9rem 1.25rem',
+                borderRadius: isUser ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+                background: isUser ? 'var(--accent)' : 'var(--bg-main)',
+                color: isUser ? '#FFFFFF' : 'var(--text-main)',
+                border: isUser ? 'none' : '1px solid var(--border-color)',
+                boxShadow: 'var(--shadow-sm)',
+                fontSize: '0.95rem',
+                lineHeight: 1.6,
+                whiteSpace: 'pre-wrap'
+              }}>
+                {msg.text}
               </div>
 
-              {isUser && (
-                <img
-                  src={user?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"}
-                  alt="User avatar"
-                  style={{ width: '38px', height: '38px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0 }}
-                />
+              {msg.timestamp && (
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-subtle)', padding: '0 0.5rem' }}>
+                  {msg.timestamp}
+                </span>
               )}
             </div>
           );
         })}
 
         {isTyping && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #10A37F, #16A34A)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Bot size={20} />
-            </div>
-            <span className="animate-pulse-glow">ChatGPT is crafting a warm response for you... 💖</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+            <Sparkles size={14} className="animate-spin" />
+            <span>{botName} is thinking...</span>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Box */}
-      <div className="card" style={{ padding: '0.75rem 1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', borderRadius: '20px' }}>
+      {/* Prompt Suggestions */}
+      <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+        {promptSuggestions.map((ps, i) => (
+          <button
+            key={i}
+            onClick={() => handleSend(ps)}
+            className="btn-ghost"
+            style={{
+              padding: '0.35rem 0.85rem',
+              borderRadius: 'var(--radius-full)',
+              border: '1px solid var(--border-color)',
+              fontSize: '0.78rem',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {ps}
+          </button>
+        ))}
+      </div>
+
+      {/* Input Area */}
+      <div style={{ display: 'flex', gap: '0.75rem' }}>
         <input
           type="text"
-          placeholder="Ask ChatGPT anything or say: 'Change my goal X to Y'..."
+          placeholder={`Talk to ${botName}...`}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
           style={{
             flex: 1,
-            background: 'transparent',
-            border: 'none', outline: 'none',
-            color: 'var(--text-main)',
-            fontSize: '1rem'
+            borderRadius: 'var(--radius-full)',
+            padding: '0.8rem 1.25rem'
           }}
         />
         <button
           onClick={() => handleSend()}
-          className="btn-primary"
           disabled={!query.trim() || isTyping}
-          style={{ padding: '0.65rem 1.25rem', borderRadius: '14px' }}
+          className="btn-primary"
+          style={{ padding: '0.8rem 1.25rem', opacity: !query.trim() ? 0.6 : 1 }}
         >
-          <Send size={18} />
-          <span>Send</span>
+          <Send size={16} />
         </button>
       </div>
 

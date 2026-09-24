@@ -7,10 +7,10 @@
   <meta name="description" content="Your personal AI journal that remembers, understands, and grows with you." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>" />
   
-  <!-- Fonts: Plus Jakarta Sans & Inter -->
+  <!-- Premium Editorial Typography: Instrument Serif, Cormorant Garamond, DM Serif Display & Manrope -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=DM+Serif+Display&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -25,6 +25,9 @@
 
   <style>
     :root {
+      --font-serif: 'Instrument Serif', 'Cormorant Garamond', 'DM Serif Display', Georgia, serif;
+      --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
       --primary: #6366F1;
       --primary-hover: #4F46E5;
       --primary-light: rgba(99, 102, 241, 0.1);
@@ -56,7 +59,21 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      font-family: var(--font-sans);
+    }
+
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+    h1, h2, h3, h4, h5, h6, .heading-font, .serif-heading {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
     }
 
     body {
@@ -1046,11 +1063,12 @@
 
     // 6. CHATGPT VIEW
     function ChatGPTView({ user, journals, goals, onUpdateGoals }) {
+      const [botName, setBotName] = useState(() => localStorage.getItem('chatbotName') || 'Your Chatbot');
       const [query, setQuery] = useState('');
       const [messages, setMessages] = useState([
         {
           sender: 'ai',
-          text: `Hey ${user.name.split(' ')[0]}! 😊 I'm ChatGPT, your super friendly, caring AI companion and journal life coach! 💖\n\nI remember all your past journal memories, goals, and milestones.\n\n✨ *How can I support you today? You can ask me anything about your reflections, or ask me to change/add any of your goals right here!*`
+          text: `Hey ${user.name.split(' ')[0]}! 😊 I'm ${botName}, your super friendly, warm AI companion and journal life coach! 💖\n\nI remember all your past journal memories, goals, and milestones.\n\n✨ *How can I support you today? You can ask me anything about your reflections, or ask me to change/add any of your goals right here!*`
         }
       ]);
       const [isTyping, setIsTyping] = useState(false);
@@ -1095,7 +1113,7 @@
               </div>
               <div>
                 <h2 style={{ fontSize: '1.6rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  ChatGPT OpenAI AI <span className="badge badge-emerald" style={{ fontSize: '0.75rem' }}>GPT 4o Best Friend</span>
+                  {botName} <span className="badge badge-emerald" style={{ fontSize: '0.75rem' }}>AI Best Friend</span>
                 </h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Super friendly, empathetic companion & instant goal customizer</p>
               </div>
@@ -1157,7 +1175,7 @@
                 <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'linear-gradient(135deg, #10A37F, #16A34A)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <i data-lucide="bot" style={{ width: '20px' }}></i>
                 </div>
-                <span>ChatGPT is crafting a warm response for you... 💖</span>
+                <span>{botName} is crafting a warm response for you... 💖</span>
               </div>
             )}
           </div>
@@ -1165,7 +1183,7 @@
           <div className="card" style={{ padding: '0.75rem 1rem', display: 'flex', gap: '0.75rem', borderRadius: '20px' }}>
             <input
               type="text"
-              placeholder="Ask ChatGPT anything or say: 'Change my goal X to Y'..."
+              placeholder={`Ask ${botName} anything or say: 'Change my goal X to Y'...`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}

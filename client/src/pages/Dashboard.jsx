@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  BookOpen,
-  Target,
-  Trophy,
-  Smile,
+  Feather,
+  Clock,
+  Compass,
+  Award,
   Sparkles,
   ArrowRight,
-  TrendingUp,
-  Clock,
-  Zap,
-  Calendar
+  Calendar,
+  Flame,
+  BookOpen,
+  Bookmark,
+  Smile,
+  Heart,
+  TrendingUp
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,6 +25,7 @@ export default function Dashboard() {
   const [goals, setGoals] = useState([]);
   const [achievements, setAchievements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [bookmarkedId, setBookmarkedId] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -48,233 +52,411 @@ export default function Dashboard() {
   }, []);
 
   const latestJournal = journals[0];
-  const currentMood = latestJournal ? `${latestJournal.moodEmoji} ${latestJournal.mood}` : "😊 Happy";
+  const currentMood = latestJournal ? `${latestJournal.moodEmoji || '🌿'} ${latestJournal.mood || 'Calm'}` : "🌿 Serene";
 
   const todayStr = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
+    month: 'long',
+    day: 'numeric'
   });
 
+  const quotes = [
+    "“Fill your paper with the breathings of your heart.” — William Wordsworth",
+    "“Journaling is like paying attention to the small miracle of being alive.”",
+    "“Write it on your heart that every day is the best day in the year.”",
+    "“In the journal I do not just express myself more freely than I tend to do with any person; I create myself.”"
+  ];
+  const randomQuote = quotes[Math.floor(Date.now() / 86400000) % quotes.length];
+
   return (
-    <div className="animate-fade-in" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem', maxWidth: '1400px', margin: '0 auto' }}>
+    <div className="animate-fade-in" style={{
+      padding: '2.5rem 2rem 4rem 2rem',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '2.5rem',
+      maxWidth: '1200px',
+      margin: '0 auto'
+    }}>
       
-      {/* Welcome Banner */}
-      <div className="glass-card" style={{
-        padding: '2.5rem',
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%)',
-        position: 'relative',
-        overflow: 'hidden',
+      {/* 1. HERO SECTION - Peaceful Stationery Greeting */}
+      <div style={{
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)',
+        padding: '2.25rem 2.5rem',
+        boxShadow: 'var(--shadow-sm)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
-        gap: '1.5rem'
+        gap: '1.75rem',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ zIndex: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', fontSize: '0.88rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-            <Calendar size={16} color="#6366F1" />
+        <div style={{ zIndex: 2, flex: 1, minWidth: '280px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+            color: 'var(--text-muted)',
+            fontSize: '14px',
+            fontWeight: 500,
+            marginBottom: '0.75rem',
+            fontFamily: 'var(--font-sans)'
+          }}>
+            <Calendar size={14} color="var(--accent)" />
             <span>{todayStr}</span>
+            <span style={{ color: 'var(--border-color)' }}>•</span>
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              color: 'var(--rose)',
+              background: 'var(--rose-light)',
+              padding: '0.15rem 0.6rem',
+              borderRadius: 'var(--radius-full)',
+              fontWeight: 600,
+              fontSize: '14px'
+            }}>
+              <Flame size={12} /> 7 Day Streak
+            </span>
           </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.5rem' }}>
-            Welcome back, {user?.name?.split(' ')[0] || 'Alex'}! ✨
+
+          <h2 style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: '48px',
+            fontWeight: 400,
+            lineHeight: 1.15,
+            letterSpacing: '-0.01em',
+            color: 'var(--text-main)',
+            marginBottom: '0.5rem'
+          }}>
+            Good day, {user?.name?.split(' ')[0] || 'Alex'}.
           </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1rem', maxWidth: '600px', lineHeight: 1.5 }}>
-            "Your personal AI journal that remembers, understands, and grows with you."
+
+          <p style={{
+            color: 'var(--text-muted)',
+            fontSize: '0.96rem',
+            maxWidth: '620px',
+            lineHeight: 1.6,
+            fontStyle: 'italic'
+          }}>
+            {randomQuote}
           </p>
         </div>
 
         <button
           onClick={() => navigate('/write')}
           className="btn-primary"
-          style={{ padding: '0.85rem 1.75rem', fontSize: '1rem', borderRadius: '16px' }}
+          style={{ padding: '0.85rem 1.75rem', fontSize: '0.95rem' }}
         >
-          <Sparkles size={20} />
-          <span>Write Today's Entry</span>
+          <Feather size={18} />
+          <span>Open Today's Notebook</span>
         </button>
       </div>
 
-      {/* Statistics Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-        
-        {/* Total Journal Entries */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(99, 102, 241, 0.12)', color: '#6366F1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <BookOpen size={26} />
+      {/* 2. APPLE-WIDGET METRIC TILES */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+        gap: '1.25rem'
+      }}>
+        {/* Metric 1 */}
+        <div className="paper-card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--accent-light)',
+            color: 'var(--accent)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <BookOpen size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Journals</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)' }}>{journals.length}</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Total Entries</div>
+            <div style={{ fontSize: '34px', fontWeight: 700, fontFamily: 'var(--font-sans)', color: 'var(--text-main)', lineHeight: 1.15 }}>{journals.length}</div>
           </div>
         </div>
 
-        {/* Goals Extracted */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(34, 197, 94, 0.12)', color: '#22C55E', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Target size={26} />
+        {/* Metric 2 */}
+        <div className="paper-card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--success-light)',
+            color: 'var(--success)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Compass size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Tracked Goals</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)' }}>{goals.length}</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Active Goals</div>
+            <div style={{ fontSize: '34px', fontWeight: 700, fontFamily: 'var(--font-sans)', color: 'var(--text-main)', lineHeight: 1.15 }}>{goals.length}</div>
           </div>
         </div>
 
-        {/* Achievements */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(245, 158, 11, 0.12)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Trophy size={26} />
+        {/* Metric 3 */}
+        <div className="paper-card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--warning-light)',
+            color: 'var(--warning)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Award size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Achievements</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-main)' }}>{achievements.length}</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Milestones</div>
+            <div style={{ fontSize: '34px', fontWeight: 700, fontFamily: 'var(--font-sans)', color: 'var(--text-main)', lineHeight: 1.15 }}>{achievements.length}</div>
           </div>
         </div>
 
-        {/* Current Mood */}
-        <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <div style={{ width: '54px', height: '54px', borderRadius: '16px', background: 'rgba(168, 85, 247, 0.12)', color: '#A855F7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Smile size={26} />
+        {/* Metric 4 */}
+        <div className="paper-card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--purple-light)',
+            color: 'var(--purple)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Smile size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>Current Mood</div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>{currentMood}</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>Current Mood</div>
+            <div style={{ fontSize: '20px', fontWeight: 600, fontFamily: 'var(--font-sans)', color: 'var(--text-main)' }}>{currentMood}</div>
           </div>
         </div>
-
       </div>
 
-      {/* Main Grid: AI Reflection + Weekly Progress + Recent Memories */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
-        
-        {/* Today's AI Reflection Card */}
-        <div className="glass-card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-              <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: 'linear-gradient(135deg, #6366F1, #22C55E)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                <Sparkles size={18} />
-              </div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Today's AI Reflection</h3>
+      {/* 3. CENTERPIECE: TODAY'S REFLECTION NOTEBOOK PAGE */}
+      <div className="notebook-page paper-texture" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="notebook-content" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <span className="badge badge-accent">
+                <Sparkles size={13} /> Gemini Reflection
+              </span>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Clock size={13} /> 3 min read
+              </span>
             </div>
-            <span className="badge badge-indigo">Gemini Insight</span>
+            {latestJournal && (
+              <span className="badge badge-success">
+                {latestJournal.moodEmoji || '🌿'} {latestJournal.mood || 'Calm'}
+              </span>
+            )}
           </div>
 
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-            {latestJournal
-              ? `"${latestJournal.summary || latestJournal.content.slice(0, 140) + '...'}"`
-              : "No reflections written for today yet. Take a moment to record your thoughts!"}
-          </p>
-
-          {latestJournal && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.5rem' }}>
-              {latestJournal.tags?.map(tag => (
-                <span key={tag} className="badge badge-emerald">#{tag}</span>
-              ))}
-            </div>
-          )}
-
-          <button
-            onClick={() => navigate('/chat')}
-            className="btn-secondary"
-            style={{ marginTop: 'auto', justifyContent: 'center' }}
-          >
-            <span>Ask AI about this memory</span>
-            <ArrowRight size={16} />
-          </button>
-        </div>
-
-        {/* Weekly Progress Card */}
-        <div className="card" style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-              <TrendingUp size={22} color="#22C55E" />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Weekly Growth Score</h3>
-            </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#22C55E' }}>92%</span>
+          {/* Reflection Content */}
+          <div>
+            <h3 style={{ fontFamily: 'var(--font-sans)', fontSize: '22px', fontWeight: 600, lineHeight: 1.3, marginBottom: '0.75rem', color: 'var(--text-main)' }}>
+              {latestJournal ? (latestJournal.title || "Today's Reflections & AI Insight") : "Today's Clean Page"}
+            </h3>
+            <p style={{
+              color: 'var(--text-main)',
+              fontSize: '16px',
+              lineHeight: 1.7,
+              opacity: 0.9,
+              maxWidth: '820px',
+              fontFamily: 'var(--font-sans)'
+            }}>
+              {latestJournal
+                ? (latestJournal.summary || latestJournal.content.slice(0, 240) + "...")
+                : "The notebook is open and waiting for your morning thoughts. Take a quiet breath, grab your cup of coffee, and write down whatever is on your mind."}
+            </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem', fontWeight: 600 }}>
-                <span>Journal Consistency</span>
-                <span>5 / 7 Days</span>
-              </div>
-              <div style={{ height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: '71%', height: '100%', background: '#6366F1', borderRadius: '4px' }}></div>
-              </div>
+          {/* Tags & Action Bar */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingTop: '1rem',
+            borderTop: '1px solid var(--border-color)',
+            flexWrap: 'wrap',
+            gap: '1rem'
+          }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {latestJournal?.tags ? (
+                latestJournal.tags.map(t => (
+                  <span key={t} className="badge badge-purple">#{t}</span>
+                ))
+              ) : (
+                <>
+                  <span className="badge badge-accent">#gratitude</span>
+                  <span className="badge badge-sky">#morning</span>
+                </>
+              )}
             </div>
 
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.35rem', fontWeight: 600 }}>
-                <span>Goal Progression</span>
-                <span>75% Achieved</span>
-              </div>
-              <div style={{ height: '8px', background: 'var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: '75%', height: '100%', background: '#22C55E', borderRadius: '4px' }}></div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ padding: '0.85rem', background: 'var(--primary-light)', borderRadius: 'var(--radius-md)', fontSize: '0.85rem', color: '#6366F1', fontWeight: 500 }}>
-            💡 You're on track to complete 2 major goals this week!
-          </div>
-        </div>
-
-      </div>
-
-      {/* Recent Memories & Activity Feed */}
-      <div className="card" style={{ padding: '1.75rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Clock size={20} color="#6366F1" />
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 700 }}>Recent Journal Memories</h3>
-          </div>
-          <button
-            onClick={() => navigate('/timeline')}
-            style={{ background: 'none', border: 'none', color: '#6366F1', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-          >
-            <span>View All</span>
-            <ArrowRight size={16} />
-          </button>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {journals.slice(0, 3).map((item) => (
-            <div
-              key={item.id}
-              onClick={() => navigate('/timeline')}
-              style={{
-                padding: '1.2rem',
-                borderRadius: 'var(--radius-md)',
-                background: 'var(--bg-main)',
-                border: '1px solid var(--border-color)',
-                display: 'flex',
-                alignItems: 'flex-start',
-                justifyContent: 'space-between',
-                gap: '1rem',
-                cursor: 'pointer',
-                transition: 'var(--transition-fast)'
-              }}
+            <button
+              onClick={() => navigate('/write')}
+              className="btn-secondary"
+              style={{ fontSize: '0.85rem' }}
             >
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                <span style={{ fontSize: '1.75rem', lineHeight: 1 }}>{item.moodEmoji || '😊'}</span>
-                <div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>
-                    {item.summary || item.content.slice(0, 90) + '...'}
+              <span>{latestJournal ? "Continue Writing" : "Start Writing Now"}</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 4. LOWER SECTION: RECENT MEMORIES & GOALS */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+        gap: '2rem'
+      }}>
+        
+        {/* Recent Memories List */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Clock size={18} color="var(--accent)" />
+              Recent Memories
+            </h3>
+            <button
+              onClick={() => navigate('/timeline')}
+              className="btn-ghost"
+              style={{ fontSize: '0.82rem' }}
+            >
+              View Timeline <ArrowRight size={14} />
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {journals.slice(0, 3).map((item) => (
+              <div
+                key={item.id}
+                onClick={() => navigate('/timeline')}
+                className="paper-card"
+                style={{
+                  padding: '1.25rem 1.5rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem',
+                  position: 'relative'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                    {new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                    <span>📅 {new Date(item.date).toLocaleDateString()}</span>
-                    <span>😊 Mood: {item.mood}</span>
-                    {item.goals?.length > 0 && <span>🎯 Goal: {item.goals[0]}</span>}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setBookmarkedId(bookmarkedId === item.id ? null : item.id);
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: bookmarkedId === item.id ? 'var(--accent)' : 'var(--text-subtle)',
+                      transition: 'var(--transition-fast)'
+                    }}
+                  >
+                    <Bookmark size={16} fill={bookmarkedId === item.id ? 'var(--accent)' : 'none'} />
+                  </button>
+                </div>
+
+                <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.4 }}>
+                  {item.title || item.summary || item.content.slice(0, 85) + '...'}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '0.25rem' }}>
+                  <span className="badge badge-accent">
+                    {item.moodEmoji || '🌿'} {item.mood || 'Calm'}
+                  </span>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-subtle)' }}>
+                    {item.tags?.[0] ? `#${item.tags[0]}` : 'journal'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Life Goals & Progress */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Compass size={18} color="var(--success)" />
+              Active Life Intentions
+            </h3>
+            <button
+              onClick={() => navigate('/goals')}
+              className="btn-ghost"
+              style={{ fontSize: '0.82rem' }}
+            >
+              All Goals <ArrowRight size={14} />
+            </button>
+          </div>
+
+          <div className="paper-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {goals.slice(0, 3).map((goal, idx) => (
+              <div key={goal.id || idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                {/* Circular Progress SVG */}
+                <div style={{ position: 'relative', width: '48px', height: '48px', flexShrink: 0 }}>
+                  <svg width="48" height="48" viewBox="0 0 36 36">
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="var(--border-color)"
+                      strokeWidth="3"
+                    />
+                    <path
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      fill="none"
+                      stroke="var(--accent)"
+                      strokeWidth="3"
+                      strokeDasharray={`${goal.progress || 65}, 100`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    color: 'var(--text-main)'
+                  }}>
+                    {goal.progress || 65}%
+                  </span>
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-main)' }}>
+                    {goal.title || goal.text}
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                    {goal.category || 'Mindfulness & Growth'}
                   </div>
                 </div>
               </div>
-              <span className="badge badge-indigo" style={{ whiteSpace: 'nowrap' }}>
-                {item.tags?.[0] ? `#${item.tags[0]}` : 'Journal'}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+
       </div>
 
     </div>

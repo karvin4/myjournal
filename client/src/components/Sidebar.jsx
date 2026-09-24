@@ -1,29 +1,28 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  PenSquare,
-  History,
-  Target,
-  Trophy,
-  Bot,
-  BarChart3,
+  BookOpen,
+  Feather,
+  Clock,
+  Compass,
+  Award,
+  Sparkles,
+  BarChart2,
   User,
-  Settings,
-  Sparkles
+  Sliders
 } from 'lucide-react';
 
 export default function Sidebar() {
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'Write Journal', path: '/write', icon: PenSquare },
-    { name: 'Timeline', path: '/timeline', icon: History },
-    { name: 'Goals', path: '/goals', icon: Target },
-    { name: 'Achievements', path: '/achievements', icon: Trophy },
-    { name: 'AI Chat', path: '/chat', icon: Bot },
-    { name: 'Weekly Summary', path: '/summary', icon: BarChart3 },
+    { name: 'Journal Hub', path: '/', icon: BookOpen },
+    { name: 'Write Entry', path: '/write', icon: Feather },
+    { name: 'Memories', path: '/timeline', icon: Clock },
+    { name: 'Life Goals', path: '/goals', icon: Compass },
+    { name: 'AI Companion', path: '/chat', icon: Sparkles },
+    { name: 'Insights', path: '/summary', icon: BarChart2 },
     { name: 'Profile', path: '/profile', icon: User },
-    { name: 'Settings', path: '/settings', icon: Settings },
+    { name: 'Settings', path: '/settings', icon: Sliders },
+    { name: 'Milestones', path: '/achievements', icon: Award },
   ];
 
   return (
@@ -39,74 +38,135 @@ export default function Sidebar() {
       zIndex: 40,
       transition: 'var(--transition-normal)'
     }}>
-      {/* Brand Header */}
+      {/* Bookshelf Brand Header */}
       <div style={{
-        padding: '1.5rem',
+        padding: '2rem 1.75rem 1.25rem 1.75rem',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem',
-        borderBottom: '1px solid var(--border-color)'
+        gap: '0.85rem'
       }}>
         <div style={{
-          width: '42px',
-          height: '42px',
+          width: '38px',
+          height: '38px',
           borderRadius: '12px',
-          background: 'linear-gradient(135deg, #6366F1 0%, #22C55E 100%)',
+          background: 'var(--accent-light)',
+          border: '1px solid rgba(108, 99, 255, 0.25)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#ffffff',
-          boxShadow: '0 4px 14px rgba(99, 102, 241, 0.4)'
+          color: 'var(--accent)'
         }}>
-          <Sparkles size={22} />
+          <Feather size={20} />
         </div>
         <div>
-          <h1 style={{ fontSize: '1.25rem', fontWeight: 800, tracking: '-0.02em', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            MyJournal <span style={{ fontSize: '0.65rem', background: 'rgba(99, 102, 241, 0.15)', color: '#6366F1', padding: '0.1rem 0.4rem', borderRadius: '6px' }}>AI</span>
+          <h1 style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            color: 'var(--text-main)',
+            letterSpacing: '-0.02em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem'
+          }}>
+            MyJournal
           </h1>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Memory & Reflection Engine</p>
+          <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 500, fontFamily: 'var(--font-sans)' }}>
+            Personal Stationery
+          </p>
         </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav style={{ flex: 1, padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto' }}>
+      {/* Bookshelf Navigation Items */}
+      <nav style={{
+        flex: 1,
+        padding: '1.25rem 1rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.45rem',
+        overflowY: 'auto'
+      }}>
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
               style={({ isActive }) => ({
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.85rem',
-                padding: '0.75rem 1rem',
+                gap: '0.9rem',
+                padding: '0.75rem 1.1rem',
                 borderRadius: 'var(--radius-md)',
-                color: isActive ? '#6366F1' : 'var(--text-muted)',
-                background: isActive ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
-                fontWeight: isActive ? 700 : 500,
-                fontSize: '0.92rem',
+                color: isActive ? 'var(--accent)' : 'var(--text-muted)',
+                background: isActive ? 'var(--bg-card)' : 'transparent',
+                fontWeight: 500,
+                fontSize: '17px',
+                fontFamily: 'var(--font-sans)',
                 textDecoration: 'none',
-                transition: 'var(--transition-fast)'
+                position: 'relative',
+                transition: 'var(--transition-fast)',
+                boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
+                border: isActive ? '1px solid var(--border-color)' : '1px solid transparent'
               })}
             >
-              <Icon size={19} />
-              <span>{item.name}</span>
+              {({ isActive }) => (
+                <>
+                  {/* Left Accent Indicator Bar */}
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute',
+                      left: '4px',
+                      top: '20%',
+                      bottom: '20%',
+                      width: '3.5px',
+                      borderRadius: '4px',
+                      background: 'var(--accent)'
+                    }} />
+                  )}
+                  <Icon size={18} style={{ opacity: isActive ? 1 : 0.7 }} />
+                  <span>{item.name}</span>
+                </>
+              )}
             </NavLink>
           );
         })}
       </nav>
 
-      {/* Bottom Pro Banner */}
-      <div style={{ padding: '1rem' }}>
-        <div className="glass-card" style={{ padding: '1rem', textAlign: 'center', borderRadius: '16px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(34, 197, 94, 0.08) 100%)' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.2rem' }}>
-            Gemini RAG Active ⚡
+      {/* Bottom Gemini Memory Engine Pill Card */}
+      <div style={{ padding: '1.25rem 1rem' }}>
+        <div style={{
+          padding: '0.9rem 1.1rem',
+          borderRadius: 'var(--radius-full)',
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            background: 'var(--accent-light)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--accent)'
+          }}>
+            <Sparkles size={14} />
           </div>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-            Auto-extracting goals & memory context
-          </p>
+          <div style={{ flex: 1, overflow: 'hidden' }}>
+            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span className="pulse-dot"></span>
+              Gemini Memory Engine
+            </div>
+            <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              Context & Retrieval Active
+            </p>
+          </div>
         </div>
       </div>
     </aside>

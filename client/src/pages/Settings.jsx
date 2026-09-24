@@ -138,10 +138,10 @@ export default function Settings() {
       
       {/* Header */}
       <div>
-        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-main)' }}>
+        <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '38px', fontWeight: 400, lineHeight: 1.15, letterSpacing: '-0.01em', color: 'var(--text-main)' }}>
           Settings & Preferences
         </h2>
-        <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '0.25rem' }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: '16px', lineHeight: 1.7, marginTop: '0.25rem', fontFamily: 'var(--font-sans)' }}>
           Customize your appearance, data exports, privacy, and notifications.
         </p>
       </div>
